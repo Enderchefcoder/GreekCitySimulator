@@ -1,4 +1,3 @@
-
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -61,7 +60,7 @@ setTimeout(() => {
         });
       } catch (wgetError) {
         console.log('wget failed, using custom node bundling...');
-        
+
         // Custom Node.js bundling similar to bundle-app.js
         const indexPath = path.join(buildDir, 'index.html');
         let htmlContent = fs.readFileSync(indexPath, 'utf8');
@@ -80,7 +79,7 @@ setTimeout(() => {
           } else {
             scriptPath = path.join(path.dirname(indexPath), scriptSrc);
           }
-          
+
           try {
             console.log(`Inlining script: ${scriptPath}`);
             const scriptContent = fs.readFileSync(scriptPath, 'utf8');
@@ -106,7 +105,7 @@ setTimeout(() => {
           } else {
             cssPath = path.join(path.dirname(indexPath), linkHref);
           }
-          
+
           try {
             console.log(`Inlining stylesheet: ${cssPath}`);
             const cssContent = fs.readFileSync(cssPath, 'utf8');
@@ -125,7 +124,7 @@ setTimeout(() => {
         while ((match = imgRegex.exec(htmlContent)) !== null) {
           const imgPath = match[1];
           if (processedUrls.has(imgPath)) continue;
-          
+
           let fullImgPath;
           if (imgPath.startsWith('/')) {
             fullImgPath = path.join(buildDir, imgPath);
@@ -135,14 +134,14 @@ setTimeout(() => {
           } else {
             fullImgPath = path.join(path.dirname(indexPath), imgPath);
           }
-          
+
           try {
             console.log(`Inlining image: ${fullImgPath}`);
             const imgBuffer = fs.readFileSync(fullImgPath);
             const imgExt = path.extname(fullImgPath).substring(1);
             const mimeType = `image/${imgExt === 'svg' ? 'svg+xml' : imgExt}`;
             const dataUrl = `data:${mimeType};base64,${imgBuffer.toString('base64')}`;
-            
+
             const escapedImgPath = imgPath.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
             const replaceRegex = new RegExp(escapedImgPath, 'g');
             htmlContent = htmlContent.replace(replaceRegex, dataUrl);
@@ -157,7 +156,7 @@ setTimeout(() => {
         while ((match = imgTagRegex.exec(htmlContent)) !== null) {
           const imgSrc = match[1];
           if (processedUrls.has(imgSrc)) continue;
-          
+
           let fullImgPath;
           if (imgSrc.startsWith('/')) {
             fullImgPath = path.join(buildDir, imgSrc);
@@ -167,14 +166,14 @@ setTimeout(() => {
           } else {
             fullImgPath = path.join(path.dirname(indexPath), imgSrc);
           }
-          
+
           try {
             console.log(`Inlining image tag: ${fullImgPath}`);
             const imgBuffer = fs.readFileSync(fullImgPath);
             const imgExt = path.extname(fullImgPath).substring(1);
             const mimeType = `image/${imgExt === 'svg' ? 'svg+xml' : imgExt}`;
             const dataUrl = `data:${mimeType};base64,${imgBuffer.toString('base64')}`;
-            
+
             const escapedImgSrc = imgSrc.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
             const replaceRegex = new RegExp(escapedImgSrc, 'g');
             htmlContent = htmlContent.replace(replaceRegex, dataUrl);
@@ -211,7 +210,7 @@ ${htmlContent}
     console.log(`\nMHTML file created at: ${outputFile}`);
     if (fs.existsSync(outputFile)) {
       console.log(`File size: ${(fs.statSync(outputFile).size / (1024 * 1024)).toFixed(2)} MB`);
-      
+
       // Create an info HTML file
       const infoPath = path.resolve(projectRoot, 'open-mhtml-instructions.html');
       const infoContent = `
@@ -254,12 +253,12 @@ ${htmlContent}
 </head>
 <body>
   <h1>How to Open Your MHTML File</h1>
-  
+
   <p>MHTML (MIME HTML) is a web archive format that combines all resources like JavaScript, CSS, and images into a single file.</p>
-  
+
   <div class="steps">
     <h2>Opening the MHTML File</h2>
-    
+
     <div class="browser">
       <h3>Using Chrome or Edge</h3>
       <ol>
@@ -278,7 +277,7 @@ ${htmlContent}
       </ol>
     </div>
   </div>
-  
+
   <div class="notes">
     <h3>Notes:</h3>
     <p>
@@ -291,7 +290,7 @@ ${htmlContent}
   </div>
 </body>
 </html>`;
-      
+
       fs.writeFileSync(infoPath, infoContent);
       console.log(`Instructions for opening MHTML created at: ${infoPath}`);
     } else {
