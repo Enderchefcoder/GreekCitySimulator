@@ -103,7 +103,7 @@ const GameContainer: React.FC = () => {
         
         {/* Footer */}
         <footer className="bg-[#8B4513] text-[#F5F5DC] p-3 text-center">
-          <p className="text-sm">&copy; 2023 Greek City-State Simulator - All rights reserved</p>
+          <p className="text-sm">Greek City-State Simulator</p>
         </footer>
       </div>
     );
@@ -143,7 +143,7 @@ const GameContainer: React.FC = () => {
 
       {/* Footer */}
       <footer className="bg-[#8B4513] text-[#F5F5DC] p-3 text-center">
-        <p className="text-sm">&copy; 2023 Greek City-State Simulator - All rights reserved</p>
+        <p className="text-sm">Greek City-State Simulator</p>
       </footer>
 
       {/* Modals */}
