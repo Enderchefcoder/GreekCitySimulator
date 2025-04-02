@@ -1,13 +1,15 @@
 import { 
   GameState, 
   Resources, 
-  RelationshipStatus, 
-  PolicyCategory,
-  GovernmentType,
   GameEvent,
-  EventType,
-  EventSeverity
 } from '@shared/schema';
+import {
+  GovernmentTypes,
+  PolicyCategories,
+  EventTypes,
+  EventSeverities,
+  RelationshipStatuses
+} from './game-enums-fix';
 import { v4 as uuidv4 } from 'uuid';
 
 /**
@@ -80,13 +82,13 @@ export const gameEngine = {
         }
         
         // Apply category-specific modifiers
-        if (policy.category === PolicyCategory.Economic) {
+        if (policy.category === PolicyCategories.Economic) {
           goldModifier += 0.1;
           foodModifier += 0.05;
-        } else if (policy.category === PolicyCategory.Military) {
+        } else if (policy.category === PolicyCategories.Military) {
           militaryModifier += 0.1;
           happinessModifier -= 5;
-        } else if (policy.category === PolicyCategory.Cultural) {
+        } else if (policy.category === PolicyCategories.Cultural) {
           happinessModifier += 10;
           goldModifier -= 0.05;
         }
@@ -94,14 +96,14 @@ export const gameEngine = {
     });
     
     // Apply government type effects
-    if (playerCity.government === GovernmentType.Democracy) {
+    if (playerCity.government === GovernmentTypes.Democracy) {
       happinessModifier += 10;
       goldModifier -= 0.1;
       militaryModifier -= 0.1;
-    } else if (playerCity.government === GovernmentType.Oligarchy) {
+    } else if (playerCity.government === GovernmentTypes.Oligarchy) {
       goldModifier += 0.2;
       happinessModifier -= 5;
-    } else if (playerCity.government === GovernmentType.Tyranny) {
+    } else if (playerCity.government === GovernmentTypes.Tyranny) {
       militaryModifier += 0.2;
       happinessModifier -= 10;
     }
@@ -151,8 +153,8 @@ export const gameEngine = {
         year: gameState.year,
         title: 'Food Shortage',
         description: 'Your city is experiencing a food shortage. Population growth has stopped, and happiness is decreasing.',
-        type: EventType.Economic,
-        severity: EventSeverity.Danger
+        type: EventTypes.Economic,
+        severity: EventSeverities.Danger
       };
       
       gameState.events.unshift(famineEvent);
@@ -173,8 +175,8 @@ export const gameEngine = {
           year: gameState.year,
           title: 'Civil Unrest',
           description: 'Your citizens are unhappy and have taken to the streets. Production has decreased.',
-          type: EventType.Political,
-          severity: EventSeverity.Warning
+          type: EventTypes.Political,
+          severity: EventSeverities.Warning
         };
         
         gameState.events.unshift(unrestEvent);
@@ -196,7 +198,7 @@ export const gameEngine = {
     // Process each relationship
     gameState.relationships.forEach(relationship => {
       // Wars slowly deteriorate relationships further
-      if (relationship.status === RelationshipStatus.War) {
+      if (relationship.status === RelationshipStatuses.War) {
         // Check if there's a chance for peace offer
         const peaceChance = 0.1; // 10% chance per turn
         
@@ -208,8 +210,8 @@ export const gameEngine = {
             year: gameState.year,
             title: 'Peace Offer',
             description: `${relationship.cityState} has offered a peace treaty.`,
-            type: EventType.Military,
-            severity: EventSeverity.Neutral,
+            type: EventTypes.Military,
+            severity: EventSeverities.Neutral,
             choices: [
               {
                 text: 'Accept Peace',
@@ -228,15 +230,15 @@ export const gameEngine = {
       
       // Trade agreements improve relationships over time
       if (relationship.treaties.includes('Trade') && 
-          relationship.status !== RelationshipStatus.Allied &&
-          relationship.status !== RelationshipStatus.War) {
+          relationship.status !== RelationshipStatuses.Allied &&
+          relationship.status !== RelationshipStatuses.War) {
         
         // Small chance to improve relationship
         const improveChance = 0.1; // 10% chance per turn
         
         if (Math.random() < improveChance) {
-          if (relationship.status === RelationshipStatus.Neutral) {
-            relationship.status = RelationshipStatus.Friendly;
+          if (relationship.status === RelationshipStatuses.Neutral) {
+            relationship.status = RelationshipStatuses.Friendly;
             
             // Create relationship improvement event
             const improvementEvent: GameEvent = {
@@ -245,12 +247,12 @@ export const gameEngine = {
               year: gameState.year,
               title: 'Improved Relations',
               description: `Relations with ${relationship.cityState} have improved to Friendly.`,
-              type: EventType.Political,
-              severity: EventSeverity.Positive
+              type: EventTypes.Political,
+              severity: EventSeverities.Positive
             };
             
             gameState.events.unshift(improvementEvent);
-          } else if (relationship.status === RelationshipStatus.Friendly) {
+          } else if (relationship.status === RelationshipStatuses.Friendly) {
             // Chance to offer alliance
             const allianceChance = 0.2; // 20% chance if already friendly
             
@@ -262,8 +264,8 @@ export const gameEngine = {
                 year: gameState.year,
                 title: 'Alliance Offer',
                 description: `${relationship.cityState} has offered an alliance.`,
-                type: EventType.Political,
-                severity: EventSeverity.Positive,
+                type: EventTypes.Political,
+                severity: EventSeverities.Positive,
                 choices: [
                   {
                     text: 'Accept Alliance',
@@ -290,7 +292,7 @@ export const gameEngine = {
   processGovernmentEffects(gameState: GameState): void {
     const playerCity = gameState.playerCityState;
     
-    if (playerCity.government === GovernmentType.Democracy) {
+    if (playerCity.government === GovernmentTypes.Democracy) {
       // Democracies have regular elections
       if (gameState.turn % 5 === 0) { // Every 5 turns
         const electionEvent: GameEvent = {
@@ -299,8 +301,8 @@ export const gameEngine = {
           year: gameState.year,
           title: 'Democratic Elections',
           description: 'It is time for elections in your democracy. The citizens are voting on new policies.',
-          type: EventType.Political,
-          severity: EventSeverity.Neutral,
+          type: EventTypes.Political,
+          severity: EventSeverities.Neutral,
           choices: [
             {
               text: 'Support economic policies',
@@ -319,7 +321,7 @@ export const gameEngine = {
         
         gameState.events.unshift(electionEvent);
       }
-    } else if (playerCity.government === GovernmentType.Oligarchy) {
+    } else if (playerCity.government === GovernmentTypes.Oligarchy) {
       // Oligarchies have occasional corruption scandals
       const corruptionChance = 0.1; // 10% chance per turn
       
@@ -330,8 +332,8 @@ export const gameEngine = {
           year: gameState.year,
           title: 'Corruption Scandal',
           description: 'A corruption scandal has been uncovered among the ruling elite.',
-          type: EventType.Political,
-          severity: EventSeverity.Warning,
+          type: EventTypes.Political,
+          severity: EventSeverities.Warning,
           choices: [
             {
               text: 'Cover it up',
@@ -346,7 +348,7 @@ export const gameEngine = {
         
         gameState.events.unshift(corruptionEvent);
       }
-    } else if (playerCity.government === GovernmentType.Tyranny) {
+    } else if (playerCity.government === GovernmentTypes.Tyranny) {
       // Tyrannies face occasional rebellion attempts
       const rebellionChance = 0.05 + (0.01 * (100 - playerCity.resources.happiness)) / 10;
       
@@ -357,8 +359,8 @@ export const gameEngine = {
           year: gameState.year,
           title: 'Rebellion Attempt',
           description: 'A group of citizens has attempted to overthrow your tyrannical rule.',
-          type: EventType.Political,
-          severity: EventSeverity.Danger,
+          type: EventTypes.Political,
+          severity: EventSeverities.Danger,
           choices: [
             {
               text: 'Crush the rebellion with force',
@@ -380,7 +382,7 @@ export const gameEngine = {
    * Process wars and battles between city-states
    */
   processWars(gameState: GameState): void {
-    const warRelationships = gameState.relationships.filter(r => r.status === RelationshipStatus.War);
+    const warRelationships = gameState.relationships.filter(r => r.status === RelationshipStatuses.War);
     
     warRelationships.forEach(relationship => {
       const enemyCity = gameState.otherCityStates.find(city => city.name === relationship.cityState);
@@ -422,8 +424,8 @@ export const gameEngine = {
               year: gameState.year,
               title: 'Victory in Battle',
               description: `Your forces have defeated ${enemyCity.name} in battle. You lost ${playerLosses} troops but the enemy lost ${enemyLosses}. You captured ${goldCaptured} gold.`,
-              type: EventType.Military,
-              severity: EventSeverity.Positive
+              type: EventTypes.Military,
+              severity: EventSeverities.Positive
             };
           } else {
             // Enemy wins
@@ -446,8 +448,8 @@ export const gameEngine = {
               year: gameState.year,
               title: 'Defeat in Battle',
               description: `Your forces have been defeated by ${enemyCity.name} in battle. You lost ${playerLosses} troops while the enemy lost ${enemyLosses}. You lost ${goldLost} gold.`,
-              type: EventType.Military,
-              severity: EventSeverity.Danger
+              type: EventTypes.Military,
+              severity: EventSeverities.Danger
             };
           }
           
@@ -455,7 +457,7 @@ export const gameEngine = {
           
           // Check if the war should end due to overwhelming victory/defeat
           if (gameState.playerCityState.resources.military < 100 || enemyCity.resources.military < 100) {
-            relationship.status = RelationshipStatus.Hostile;
+            relationship.status = RelationshipStatuses.Hostile;
             
             const peaceEvent: GameEvent = {
               id: uuidv4(),
@@ -463,8 +465,8 @@ export const gameEngine = {
               year: gameState.year,
               title: 'War Ended',
               description: `The war with ${enemyCity.name} has ended due to one side's inability to continue fighting.`,
-              type: EventType.Military,
-              severity: EventSeverity.Positive
+              type: EventTypes.Military,
+              severity: EventSeverities.Positive
             };
             
             gameState.events.unshift(peaceEvent);
@@ -497,17 +499,17 @@ export const gameEngine = {
       // AI decision making - declare war or seek peace based on relative strength
       const relationship = gameState.relationships.find(r => r.cityState === cityState.name);
       
-      if (relationship && relationship.status !== RelationshipStatus.War) {
+      if (relationship && relationship.status !== RelationshipStatuses.War) {
         // Calculate relative strength
         const playerStrength = gameState.playerCityState.resources.military;
         const aiStrength = cityState.resources.military;
         
         // If AI is much stronger and relations are hostile, they might declare war
         if (aiStrength > playerStrength * 1.5 && 
-            relationship.status === RelationshipStatus.Hostile && 
+            relationship.status === RelationshipStatuses.Hostile && 
             Math.random() < 0.2) { // 20% chance per turn
           
-          relationship.status = RelationshipStatus.War;
+          relationship.status = RelationshipStatuses.War;
           
           const warEvent: GameEvent = {
             id: uuidv4(),
@@ -515,8 +517,8 @@ export const gameEngine = {
             year: gameState.year,
             title: 'War Declared',
             description: `${cityState.name} has declared war on your city-state.`,
-            type: EventType.Military,
-            severity: EventSeverity.Danger
+            type: EventTypes.Military,
+            severity: EventSeverities.Danger
           };
           
           gameState.events.unshift(warEvent);

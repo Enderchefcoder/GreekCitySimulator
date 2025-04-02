@@ -11,13 +11,13 @@ const DiplomacyTab: React.FC = () => {
 
   const getRelationshipColor = (status: RelationshipStatus): string => {
     switch (status) {
-      case RelationshipStatus.Allied:
+      case 'Allied':
         return 'text-[#4CAF50]';
-      case RelationshipStatus.Friendly:
+      case 'Friendly':
         return 'text-[#2196F3]';
-      case RelationshipStatus.Hostile:
+      case 'Hostile':
         return 'text-[#FF9800]';
-      case RelationshipStatus.War:
+      case 'War':
         return 'text-[#B71C1C]';
       default:
         return 'text-[#333333]';
@@ -70,7 +70,7 @@ const DiplomacyTab: React.FC = () => {
                   
                   {/* Action buttons */}
                   <div className="flex flex-wrap gap-2 mt-3">
-                    {relationship.status !== RelationshipStatus.War ? (
+                    {relationship.status !== 'War' ? (
                       <Button 
                         variant="outline"
                         size="sm"
@@ -90,7 +90,7 @@ const DiplomacyTab: React.FC = () => {
                       </Button>
                     )}
                     
-                    {relationship.status !== RelationshipStatus.War && (
+                    {relationship.status !== 'War' && (
                       <>
                         {!relationship.treaties.includes('Trade') && (
                           <Button 
@@ -103,7 +103,7 @@ const DiplomacyTab: React.FC = () => {
                           </Button>
                         )}
                         
-                        {relationship.status !== RelationshipStatus.Allied && (
+                        {relationship.status !== 'Allied' && (
                           <Button 
                             variant="outline"
                             size="sm"

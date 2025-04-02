@@ -26,7 +26,7 @@ const CityTab: React.FC<CityTabProps> = ({ onOpenGovernmentModal }) => {
     const policy = {
       id: uuidv4(),
       name: structureName,
-      description: `This ${category.toLowerCase()} structure provides various bonuses.`,
+      description: `This structure provides various bonuses for ${category.toLowerCase()}.`,
       effects,
       category,
       active: true
@@ -163,7 +163,7 @@ const CityTab: React.FC<CityTabProps> = ({ onOpenGovernmentModal }) => {
                   className="justify-start border-[#8B4513] text-[#8B4513] hover:bg-[#D2B48C]"
                   onClick={() => handleBuildStructure(
                     'Agora', 
-                    PolicyCategory.Economic, 
+                    'Economic' as PolicyCategory, 
                     300, 
                     { gold: 20, happiness: 10 }
                   )}
@@ -178,7 +178,7 @@ const CityTab: React.FC<CityTabProps> = ({ onOpenGovernmentModal }) => {
                   className="justify-start border-[#8B4513] text-[#8B4513] hover:bg-[#D2B48C]"
                   onClick={() => handleBuildStructure(
                     'Temple', 
-                    PolicyCategory.Cultural, 
+                    'Cultural' as PolicyCategory, 
                     250, 
                     { happiness: 25 }
                   )}
@@ -193,7 +193,7 @@ const CityTab: React.FC<CityTabProps> = ({ onOpenGovernmentModal }) => {
                   className="justify-start border-[#8B4513] text-[#8B4513] hover:bg-[#D2B48C]"
                   onClick={() => handleBuildStructure(
                     'Barracks', 
-                    PolicyCategory.Military, 
+                    'Military' as PolicyCategory, 
                     350, 
                     { military: 50 }
                   )}
@@ -208,7 +208,7 @@ const CityTab: React.FC<CityTabProps> = ({ onOpenGovernmentModal }) => {
                   className="justify-start border-[#8B4513] text-[#8B4513] hover:bg-[#D2B48C]"
                   onClick={() => handleBuildStructure(
                     'Farm', 
-                    PolicyCategory.Economic, 
+                    'Economic' as PolicyCategory, 
                     200, 
                     { food: 30 }
                   )}
@@ -234,11 +234,11 @@ const CityTab: React.FC<CityTabProps> = ({ onOpenGovernmentModal }) => {
                 <div 
                   key={policy.id} 
                   className={`p-2 border-l-4 bg-[#D2B48C] bg-opacity-20 ${
-                    policy.category === PolicyCategory.Economic 
+                    policy.category === 'Economic' 
                       ? 'border-[#B8860B]' 
-                      : policy.category === PolicyCategory.Military 
+                      : policy.category === 'Military' 
                       ? 'border-[#FF9800]' 
-                      : policy.category === PolicyCategory.Cultural 
+                      : policy.category === 'Cultural' 
                       ? 'border-[#4CAF50]'
                       : 'border-[#8B4513]'
                   }`}
@@ -273,7 +273,7 @@ const CityTab: React.FC<CityTabProps> = ({ onOpenGovernmentModal }) => {
                   name: 'Fair Taxation',
                   description: 'Moderate income, high citizen happiness',
                   effects: { gold: 10, happiness: 5 },
-                  category: PolicyCategory.Economic,
+                  category: 'Economic' as PolicyCategory,
                   active: true
                 });
               }}

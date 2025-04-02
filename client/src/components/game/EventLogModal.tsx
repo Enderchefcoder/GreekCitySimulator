@@ -9,8 +9,7 @@ interface EventLogModalProps {
 }
 
 const EventLogModal: React.FC<EventLogModalProps> = ({ onClose }) => {
-  const { game } = useGame();
-  const exportHistory = game?.exportHistory;
+  const { game, exportHistory } = useGame();
 
   if (!game) return null;
 
@@ -32,6 +31,8 @@ const EventLogModal: React.FC<EventLogModalProps> = ({ onClose }) => {
     switch (severity) {
       case 'Positive':
         return 'text-[#4CAF50]';
+      case 'Neutral':
+        return '';
       case 'Warning':
         return 'text-[#FF9800]';
       case 'Danger':
@@ -84,10 +85,7 @@ const EventLogModal: React.FC<EventLogModalProps> = ({ onClose }) => {
           <Button 
             variant="outline"
             className="bg-[#D2B48C] hover:bg-amber-200 text-[#8B4513] border border-[#8B4513] cinzel"
-            onClick={() => {
-              // Export functionality will be implemented later
-              console.log('Export history functionality will be added');
-            }}
+            onClick={exportHistory}
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 inline mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />

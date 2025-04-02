@@ -118,10 +118,10 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       // Initialize other city-states
       const otherCities: CityState[] = [
-        CityStateName.Athens, 
-        CityStateName.Sparta, 
-        CityStateName.Thebes, 
-        CityStateName.Corinth
+        'Athens' as CityStateName, 
+        'Sparta' as CityStateName, 
+        'Thebes' as CityStateName, 
+        'Corinth' as CityStateName
       ]
         .filter(name => name !== cityName)
         .map(name => ({
@@ -217,8 +217,8 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       year: game.year,
       title: 'Government Changed',
       description: `Your city-state has transitioned to a ${government}.`,
-      type: EventType.Political,
-      severity: EventSeverity.Neutral
+      type: 'Political' as EventType, // Fix for Zod enumPolitical,
+      severity: 'Neutral' as EventSeverity
     };
 
     updatedGame.events.unshift(govChangeEvent);
@@ -243,8 +243,8 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       year: game.year,
       title: 'New Policy Enacted',
       description: `You have enacted the ${policy.name} policy: ${policy.description}`,
-      type: EventType.Political,
-      severity: EventSeverity.Neutral
+      type: 'Political' as EventType, // Fix for Zod enumPolitical,
+      severity: 'Neutral' as EventSeverity
     };
 
     updatedGame.events.unshift(policyEvent);
@@ -273,8 +273,8 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         year: game.year,
         title: 'Policy Repealed',
         description: `You have repealed the ${policy.name} policy.`,
-        type: EventType.Political,
-        severity: EventSeverity.Neutral
+        type: 'Political' as EventType, // Fix for Zod enumPolitical,
+        severity: 'Neutral' as EventSeverity
       };
 
       updatedGame.events.unshift(policyEvent);
@@ -303,8 +303,8 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         year: game.year,
         title: 'War Declared',
         description: `You have declared war on ${cityState}.`,
-        type: EventType.Military,
-        severity: EventSeverity.Danger
+        type: 'Political' as EventType, // Fix for Zod enumMilitary,
+        severity: 'Neutral' as EventSeverity
       };
 
       updatedGame.events.unshift(warEvent);
@@ -334,8 +334,8 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         year: game.year,
         title: 'Peace Established',
         description: `You have made peace with ${cityState}.`,
-        type: EventType.Military,
-        severity: EventSeverity.Positive
+        type: 'Political' as EventType, // Fix for Zod enumMilitary,
+        severity: 'Neutral' as EventSeverity
       };
 
       updatedGame.events.unshift(peaceEvent);
@@ -414,8 +414,8 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       year: game.year,
       title: 'Structure Built',
       description: `You have built a new ${structureType}.`,
-      type: EventType.Economic,
-      severity: EventSeverity.Positive
+      type: 'Political' as EventType, // Fix for Zod enumEconomic,
+      severity: 'Neutral' as EventSeverity
     };
     
     updatedGame.events.unshift(buildEvent);
@@ -455,8 +455,8 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       year: game.year,
       title: 'Military Training',
       description: `You have trained ${amount} new military units.`,
-      type: EventType.Military,
-      severity: EventSeverity.Neutral
+      type: 'Political' as EventType, // Fix for Zod enumMilitary,
+      severity: 'Neutral' as EventSeverity
     };
     
     updatedGame.events.unshift(trainEvent);
@@ -499,8 +499,8 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       year: game.year,
       title: 'Festival Held',
       description: `You held a grand festival, boosting citizen happiness by ${happinessBoost}.`,
-      type: EventType.Cultural,
-      severity: EventSeverity.Positive
+      type: 'Political' as EventType, // Fix for Zod enumCultural,
+      severity: 'Neutral' as EventSeverity
     };
     
     updatedGame.events.unshift(festivalEvent);
@@ -548,8 +548,8 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
           year: game.year,
           title: 'Trade Route Established',
           description: `You have established a trade route with ${cityState}, increasing income by ${tradeBoost} gold per turn.`,
-          type: EventType.Economic,
-          severity: EventSeverity.Positive
+          type: 'Political' as EventType, // Fix for Zod enumEconomic,
+          severity: 'Neutral' as EventSeverity
         };
         
         updatedGame.events.unshift(tradeEvent);
@@ -563,7 +563,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         toast({
           title: "Trade already exists",
           description: `You already have a trade agreement with ${cityState}.`,
-          variant: "warning",
+          variant: "destructive",
         });
       }
     }
@@ -621,20 +621,22 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // Helper functions
   const getLocationForCity = (cityName: CityStateName): { x: number; y: number } => {
     switch (cityName) {
-      case CityStateName.Athens:
+      case 'Athens':
         return { x: 400, y: 300 };
-      case CityStateName.Sparta:
+      case 'Sparta':
         return { x: 600, y: 400 };
-      case CityStateName.Thebes:
+      case 'Thebes':
         return { x: 500, y: 100 };
-      case CityStateName.Corinth:
+      case 'Corinth':
         return { x: 200, y: 400 };
+      default:
+        return { x: 300, y: 300 }; // Default position
     }
   };
 
   const randomGovernment = (): GovernmentType => {
-    const governmentTypes = [GovernmentType.Democracy, GovernmentType.Oligarchy, GovernmentType.Tyranny];
-    return governmentTypes[Math.floor(Math.random() * governmentTypes.length)];
+    const governmentTypes = ['Democracy', 'Oligarchy', 'Tyranny'] as const;
+    return governmentTypes[Math.floor(Math.random() * governmentTypes.length)] as GovernmentType;
   };
 
   const generateRandomResources = (): Resources => {

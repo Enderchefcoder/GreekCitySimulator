@@ -30,30 +30,66 @@ export const ResourceTypeValues = {
   happiness: 'happiness' as const
 };
 
-export const GovernmentType = z.enum(['Democracy', 'Oligarchy', 'Tyranny']);
-export type GovernmentType = z.infer<typeof GovernmentType>;
+// Define string literal type for government types
+export type GovernmentType = 'Democracy' | 'Oligarchy' | 'Tyranny';
+
+// Create Zod validator for GovernmentType
+export const GovernmentTypeSchema = z.enum(['Democracy', 'Oligarchy', 'Tyranny']);
 
 // For direct value access
 export const GovernmentTypeValues = {
-  Democracy: 'Democracy' as const,
-  Oligarchy: 'Oligarchy' as const,
-  Tyranny: 'Tyranny' as const
+  Democracy: 'Democracy' as GovernmentType,
+  Oligarchy: 'Oligarchy' as GovernmentType,
+  Tyranny: 'Tyranny' as GovernmentType
 };
 
-export const RelationshipStatus = z.enum(['Neutral', 'Friendly', 'Allied', 'Hostile', 'War']);
-export type RelationshipStatus = z.infer<typeof RelationshipStatus>;
+// Define string literal types for all enums
+export type RelationshipStatus = 'Neutral' | 'Friendly' | 'Allied' | 'Hostile' | 'War';
+export const RelationshipStatusSchema = z.enum(['Neutral', 'Friendly', 'Allied', 'Hostile', 'War']);
+export const RelationshipStatusValues = {
+  Neutral: 'Neutral' as RelationshipStatus,
+  Friendly: 'Friendly' as RelationshipStatus,
+  Allied: 'Allied' as RelationshipStatus,
+  Hostile: 'Hostile' as RelationshipStatus,
+  War: 'War' as RelationshipStatus
+};
 
-export const EventType = z.enum(['Political', 'Military', 'Economic', 'Disaster', 'Cultural']);
-export type EventType = z.infer<typeof EventType>;
+export type EventType = 'Political' | 'Military' | 'Economic' | 'Disaster' | 'Cultural';
+export const EventTypeSchema = z.enum(['Political', 'Military', 'Economic', 'Disaster', 'Cultural']);
+export const EventTypeValues = {
+  Political: 'Political' as EventType,
+  Military: 'Military' as EventType,
+  Economic: 'Economic' as EventType,
+  Disaster: 'Disaster' as EventType,
+  Cultural: 'Cultural' as EventType
+};
 
-export const EventSeverity = z.enum(['Positive', 'Neutral', 'Warning', 'Danger']);
-export type EventSeverity = z.infer<typeof EventSeverity>;
+export type EventSeverity = 'Positive' | 'Neutral' | 'Warning' | 'Danger';
+export const EventSeveritySchema = z.enum(['Positive', 'Neutral', 'Warning', 'Danger']);
+export const EventSeverityValues = {
+  Positive: 'Positive' as EventSeverity,
+  Neutral: 'Neutral' as EventSeverity,
+  Warning: 'Warning' as EventSeverity,
+  Danger: 'Danger' as EventSeverity
+};
 
-export const PolicyCategory = z.enum(['Economic', 'Military', 'Cultural', 'Diplomatic']);
-export type PolicyCategory = z.infer<typeof PolicyCategory>;
+export type PolicyCategory = 'Economic' | 'Military' | 'Cultural' | 'Diplomatic';
+export const PolicyCategorySchema = z.enum(['Economic', 'Military', 'Cultural', 'Diplomatic']);
+export const PolicyCategoryValues = {
+  Economic: 'Economic' as PolicyCategory,
+  Military: 'Military' as PolicyCategory,
+  Cultural: 'Cultural' as PolicyCategory,
+  Diplomatic: 'Diplomatic' as PolicyCategory
+};
 
-export const CityStateName = z.enum(['Athens', 'Sparta', 'Thebes', 'Corinth']);
-export type CityStateName = z.infer<typeof CityStateName>;
+export type CityStateName = 'Athens' | 'Sparta' | 'Thebes' | 'Corinth';
+export const CityStateNameSchema = z.enum(['Athens', 'Sparta', 'Thebes', 'Corinth']);
+export const CityStateNameValues = {
+  Athens: 'Athens' as CityStateName,
+  Sparta: 'Sparta' as CityStateName,
+  Thebes: 'Thebes' as CityStateName,
+  Corinth: 'Corinth' as CityStateName
+};
 
 // Interfaces for the game
 export interface Resources {

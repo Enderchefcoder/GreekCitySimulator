@@ -48,14 +48,14 @@ const GameContainer: React.FC = () => {
               <div className="mb-6">
                 <h3 className="cinzel font-bold text-[#8B4513] mb-2">Choose Your City</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                  {Object.values(CityStateName).map((city) => (
+                  {(['Athens', 'Sparta', 'Thebes', 'Corinth'] as const).map((city) => (
                     <Button
                       key={city}
                       variant={selectedCity === city ? "default" : "outline"}
                       className={selectedCity === city 
                         ? "bg-[#8B4513] hover:bg-[#6a340f] text-white border-[#8B4513]" 
                         : "border-[#8B4513] text-[#8B4513]"}
-                      onClick={() => setSelectedCity(city)}
+                      onClick={() => setSelectedCity(city as CityStateName)}
                     >
                       {city}
                     </Button>
@@ -66,7 +66,7 @@ const GameContainer: React.FC = () => {
               <div className="mb-6">
                 <h3 className="cinzel font-bold text-[#8B4513] mb-2">Choose Your Government</h3>
                 <div className="space-y-2">
-                  {Object.values(GovernmentType).map((govt) => (
+                  {(['Democracy', 'Oligarchy', 'Tyranny'] as const).map((govt) => (
                     <div 
                       key={govt}
                       className={`p-3 rounded border cursor-pointer ${
@@ -74,7 +74,7 @@ const GameContainer: React.FC = () => {
                           ? "bg-[#D2B48C] border-[#8B4513]" 
                           : "bg-white border-[#D2B48C] hover:bg-[#f5f5f5]"
                       }`}
-                      onClick={() => setSelectedGovernment(govt)}
+                      onClick={() => setSelectedGovernment(govt as GovernmentType)}
                     >
                       <div className="font-bold cinzel">{govt}</div>
                       <div className="text-sm text-gray-700">
