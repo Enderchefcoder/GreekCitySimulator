@@ -1,5 +1,7 @@
 import React from 'react';
 import { useGame } from '@/contexts/GameContext';
+import { useMultiplayer } from '@/contexts/MultiplayerContext';
+import { ResourceTypeValues } from '@shared/schema';
 import { Button } from '@/components/ui/button';
 import { GameEvent } from '@shared/schema';
 import { EventSeverities } from '@/lib/game-enums-fix';
@@ -10,7 +12,9 @@ interface GameSidebarProps {
 }
 
 const GameSidebar: React.FC<GameSidebarProps> = ({ onOpenEventLog, onEventChoice }) => {
-  const { game, endTurn, exportHistory } = useGame();
+  const { game, endTurn } = useGame();
+  const { session, isMyTurn, actionsRemaining, endTurn: endMultiplayerTurn } = useMultiplayer();
+  const [showHappinessDetails, setShowHappinessDetails] = React.useState(false);
 
   if (!game) {
     return <div>Loading...</div>;
@@ -31,6 +35,14 @@ const GameSidebar: React.FC<GameSidebarProps> = ({ onOpenEventLog, onEventChoice
     }
   };
 
+  const handleEndTurn = () => {
+    if (session) {
+      endMultiplayerTurn();
+    } else {
+      endTurn();
+    }
+  };
+
   return (
     <div className="w-full lg:w-1/4">
       {/* Turn Information */}
@@ -41,12 +53,34 @@ const GameSidebar: React.FC<GameSidebarProps> = ({ onOpenEventLog, onEventChoice
         </div>
         <Button 
           className="w-full bg-[#B8860B] hover:bg-amber-700 text-white py-2 rounded cinzel font-bold"
-          onClick={endTurn}
+          onClick={handleEndTurn}
+          disabled={session && (!isMyTurn || actionsRemaining > 0)}
         >
-          End Turn
+          {session 
+            ? isMyTurn 
+              ? `End Turn (${actionsRemaining} actions left)` 
+              : "Waiting for other player" 
+            : "End Turn"
+          }
         </Button>
       </div>
-      
+
+      {/* Multiplayer status */}
+      {session && (
+        <div className="mt-4 p-3 bg-[#D2B48C] rounded">
+          <h3 className="text-sm font-bold mb-1">Multiplayer Mode</h3>
+          <p className="text-xs mb-2">
+            {isMyTurn 
+              ? `Your turn - ${actionsRemaining} actions remaining` 
+              : "Waiting for other player's turn"}
+          </p>
+          <div className="text-xs">
+            Players: {session.players.map(p => p.username).join(', ')}
+          </div>
+        </div>
+      )}
+
+
       {/* Event Log */}
       <div className="bg-white rounded-lg shadow-md p-4">
         <div className="flex justify-between items-center mb-2">
@@ -56,11 +90,11 @@ const GameSidebar: React.FC<GameSidebarProps> = ({ onOpenEventLog, onEventChoice
             onClick={onOpenEventLog}
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253" />
             </svg> Full Log
           </button>
         </div>
-        
+
         <div className="max-h-[70vh] overflow-y-auto scrollbar-thin scrollbar-thumb-[#8B4513] scrollbar-track-[#D2B48C]">
           {game.events.slice(0, 5).map((event: GameEvent) => (
             <div key={event.id} className="event-card mb-3 p-3 rounded border border-[#D2B48C]">
@@ -72,7 +106,7 @@ const GameSidebar: React.FC<GameSidebarProps> = ({ onOpenEventLog, onEventChoice
                 {event.title}
               </h4>
               <p className="text-sm">{event.description}</p>
-              
+
               {event.choices && event.choices.length > 0 && (
                 <div className="mt-2">
                   <Button 
@@ -86,14 +120,14 @@ const GameSidebar: React.FC<GameSidebarProps> = ({ onOpenEventLog, onEventChoice
               )}
             </div>
           ))}
-          
+
           {game.events.length === 0 && (
             <div className="text-center py-4 text-gray-500">
               No events yet. End your turn to begin your journey.
             </div>
           )}
         </div>
-        
+
         <Button 
           className="mt-3 w-full bg-[#D2B48C] hover:bg-amber-200 text-[#8B4513] p-2 rounded border border-[#8B4513] cinzel"
           onClick={exportHistory}
@@ -102,6 +136,72 @@ const GameSidebar: React.FC<GameSidebarProps> = ({ onOpenEventLog, onEventChoice
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
           </svg> Export History
         </Button>
+      </div>
+      {/* Happiness Section */}
+      <div className="bg-white rounded-lg shadow-md p-4 mt-4">
+        <div className="flex flex-row justify-between mt-2">
+          <div>
+            <p className="text-sm">Happiness</p>
+          </div>
+          <div className="flex items-center">
+            <p className="text-sm">{game.playerCityState.resources.happiness.toLocaleString()}</p>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className="ml-1 h-5 w-5 p-0" 
+              onClick={() => setShowHappinessDetails(prevState => !prevState)}
+            >
+              <span className="text-xs">ⓘ</span>
+            </Button>
+          </div>
+        </div>
+
+        {showHappinessDetails && game.playerCityState.resources.happinessFactors && (
+          <div className="mt-2 text-xs bg-[#D2B48C] bg-opacity-20 p-2 rounded">
+            <h4 className="font-bold mb-1">Happiness Factors:</h4>
+            <div className="grid grid-cols-2 gap-x-2 gap-y-1">
+              <div>Taxation:</div>
+              <div className={game.playerCityState.resources.happinessFactors.taxationLevel >= 0 ? "text-green-700" : "text-red-700"}>
+                {game.playerCityState.resources.happinessFactors.taxationLevel > 0 ? "+" : ""}
+                {game.playerCityState.resources.happinessFactors.taxationLevel}
+              </div>
+
+              <div>Food Security:</div>
+              <div className={game.playerCityState.resources.happinessFactors.foodSecurity >= 0 ? "text-green-700" : "text-red-700"}>
+                {game.playerCityState.resources.happinessFactors.foodSecurity > 0 ? "+" : ""}
+                {game.playerCityState.resources.happinessFactors.foodSecurity}
+              </div>
+
+              <div>Military Presence:</div>
+              <div className={game.playerCityState.resources.happinessFactors.militaryPresence >= 0 ? "text-green-700" : "text-red-700"}>
+                {game.playerCityState.resources.happinessFactors.militaryPresence > 0 ? "+" : ""}
+                {game.playerCityState.resources.happinessFactors.militaryPresence}
+              </div>
+
+              <div>Culture:</div>
+              <div className="text-green-700">
+                +{game.playerCityState.resources.happinessFactors.culturalInvestment}
+              </div>
+
+              <div>War Weariness:</div>
+              <div className={game.playerCityState.resources.happinessFactors.warWeariness >= 0 ? "text-green-700" : "text-red-700"}>
+                {game.playerCityState.resources.happinessFactors.warWeariness}
+              </div>
+
+              <div>Political Stability:</div>
+              <div className={game.playerCityState.resources.happinessFactors.politicalStability >= 0 ? "text-green-700" : "text-red-700"}>
+                {game.playerCityState.resources.happinessFactors.politicalStability > 0 ? "+" : ""}
+                {game.playerCityState.resources.happinessFactors.politicalStability}
+              </div>
+
+              <div>Recent Events:</div>
+              <div className={game.playerCityState.resources.happinessFactors.recentEvents >= 0 ? "text-green-700" : "text-red-700"}>
+                {game.playerCityState.resources.happinessFactors.recentEvents > 0 ? "+" : ""}
+                {game.playerCityState.resources.happinessFactors.recentEvents}
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

@@ -106,7 +106,73 @@ export const gameEngine = {
     } else if (playerCity.government === GovernmentTypes.Tyranny) {
       militaryModifier += 0.2;
       happinessModifier -= 10;
+    } else if (playerCity.government === GovernmentTypes.Aristocracy) {
+      goldModifier += 0.15;
+      happinessModifier -= 8;
+      militaryModifier += 0.1;
+    } else if (playerCity.government === GovernmentTypes.Timocracy) {
+      militaryModifier += 0.25;
+      goldModifier += 0.1;
+      happinessModifier -= 5;
+    } else if (playerCity.government === GovernmentTypes.ConstitutionalMonarchy) {
+      happinessModifier += 5;
+      goldModifier += 0.05;
+      militaryModifier += 0.05;
     }
+    
+    // Initialize happiness factors
+    if (!resources.happinessFactors) {
+      resources.happinessFactors = {
+        taxationLevel: 0,
+        foodSecurity: 0,
+        militaryPresence: 0,
+        culturalInvestment: 0,
+        warWeariness: 0,
+        politicalStability: 0,
+        recentEvents: 0
+      };
+    }
+    
+    // Calculate happiness factors
+    // Tax level based on gold production relative to population
+    const effectiveTaxRate = goldIncome / (resources.population / 100);
+    resources.happinessFactors.taxationLevel = Math.max(-20, Math.min(10, 10 - Math.floor(effectiveTaxRate / 2)));
+    
+    // Food security based on food reserves per population
+    const foodPerCapita = resources.food / (resources.population / 1000);
+    resources.happinessFactors.foodSecurity = Math.max(-20, Math.min(20, Math.floor(foodPerCapita) - 10));
+    
+    // Military presence (too much military can make citizens uneasy)
+    const militaryRatio = resources.military / (resources.population / 100);
+    resources.happinessFactors.militaryPresence = Math.max(-10, Math.min(10, 5 - Math.floor(militaryRatio)));
+    
+    // Cultural investment from policies
+    const culturalPolicies = gameState.policies.filter(p => p.category === PolicyCategories.Cultural && p.active);
+    resources.happinessFactors.culturalInvestment = Math.min(20, culturalPolicies.length * 5);
+    
+    // War weariness (cumulative negative effect from being at war)
+    const atWarWith = gameState.relationships.filter(r => r.status === RelationshipStatuses.War).length;
+    resources.happinessFactors.warWeariness = Math.max(-30, -atWarWith * 10);
+    
+    // Political stability based on government and turn count
+    let stability = 0;
+    if (playerCity.government === GovernmentTypes.Democracy) stability = 10;
+    else if (playerCity.government === GovernmentTypes.ConstitutionalMonarchy) stability = 5;
+    else if (playerCity.government === GovernmentTypes.Tyranny) stability = -10;
+    resources.happinessFactors.politicalStability = Math.max(-15, Math.min(15, stability));
+    
+    // Recent events effect
+    const recentEvents = gameState.events.slice(0, 5);
+    let eventEffect = 0;
+    recentEvents.forEach(event => {
+      if (event.severity === EventSeverities.Positive) eventEffect += 3;
+      else if (event.severity === EventSeverities.Danger) eventEffect -= 5;
+      else if (event.severity === EventSeverities.Warning) eventEffect -= 2;
+    });
+    resources.happinessFactors.recentEvents = Math.max(-20, Math.min(20, eventEffect));
+    
+    // Calculate total happiness from factors
+    const totalFactorsEffect = Object.values(resources.happinessFactors).reduce((sum, value) => sum + value, 0);
     
     // Apply trade agreement bonuses
     const tradePartners = gameState.relationships.filter(r => r.treaties.includes('Trade'));

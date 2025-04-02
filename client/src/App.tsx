@@ -3,6 +3,7 @@ import { Toaster } from "@/components/ui/toaster";
 import NotFound from "@/pages/not-found";
 import GameContainer from "@/components/game/GameContainer";
 import { GameProvider } from "@/contexts/GameContext";
+import { MultiplayerProvider } from "@/contexts/MultiplayerContext"; // Added import
 
 function Router() {
   return (
@@ -16,8 +17,10 @@ function Router() {
 function App() {
   return (
     <GameProvider>
-      <Router />
-      <Toaster />
+      <MultiplayerProvider> {/* Added MultiplayerProvider */}
+        <Router />
+        <Toaster />
+      </MultiplayerProvider> {/* Added MultiplayerProvider */}
     </GameProvider>
   );
 }

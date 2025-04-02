@@ -103,6 +103,15 @@ export interface Resources {
   population: number;
   military: number;
   happiness: number;
+  happinessFactors?: {
+    taxationLevel: number;
+    foodSecurity: number;
+    militaryPresence: number;
+    culturalInvestment: number;
+    warWeariness: number;
+    politicalStability: number;
+    recentEvents: number;
+  };
 }
 
 export interface Policy {
@@ -159,6 +168,36 @@ export interface GameState {
 }
 
 // Game state table
+
+export interface MultiplayerSession {
+  id: string;
+  gameStateId: string;
+  players: {
+    id: number;
+    username: string;
+    cityState: CityStateName;
+    isCurrentTurn: boolean;
+    actionsRemaining: number;
+    isConnected: boolean;
+    lastActive: Date;
+  }[];
+  turnNumber: number;
+  turnTimeLimit: number; // seconds
+  currentTurnStartedAt: Date;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface CitizenHappinessFactors {
+  taxationLevel: number; // -20 to +10
+  foodSecurity: number; // -20 to +20
+  militaryPresence: number; // -10 to +10
+  culturalInvestment: number; // 0 to +20
+  warWeariness: number; // -30 to 0
+  politicalStability: number; // -15 to +15
+  recentEvents: number; // -20 to +20
+}
+
 export const gameStates = pgTable("game_states", {
   id: serial("id").primaryKey(),
   userId: integer("user_id").notNull().references(() => users.id),

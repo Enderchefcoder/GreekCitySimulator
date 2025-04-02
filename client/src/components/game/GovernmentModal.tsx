@@ -2,14 +2,18 @@ import React from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { useGame } from '@/contexts/GameContext';
-// Local declaration instead of import
-type GovernmentType = 'Democracy' | 'Oligarchy' | 'Tyranny';
+
+// Expanded Government Type Enum
+type GovernmentType = 'Democracy' | 'Oligarchy' | 'Tyranny' | 'Aristocracy' | 'Timocracy' | 'ConstitutionalMonarchy';
 
 // Values for accessing government types
 const GovernmentTypeValues = {
   Democracy: 'Democracy' as GovernmentType,
   Oligarchy: 'Oligarchy' as GovernmentType,
-  Tyranny: 'Tyranny' as GovernmentType
+  Tyranny: 'Tyranny' as GovernmentType,
+  Aristocracy: 'Aristocracy' as GovernmentType,
+  Timocracy: 'Timocracy' as GovernmentType,
+  ConstitutionalMonarchy: 'ConstitutionalMonarchy' as GovernmentType
 };
 
 interface GovernmentModalProps {
@@ -36,12 +40,12 @@ const GovernmentModal: React.FC<GovernmentModalProps> = ({ onClose }) => {
         <DialogHeader>
           <DialogTitle className="text-2xl cinzel font-bold text-[#8B4513]">Change Government</DialogTitle>
         </DialogHeader>
-        
+
         <div className="my-4">
           <p className="mb-4">
-            Choose a new form of government for your city-state. This change will impact how laws are made and may affect resource production.
+            Choose a new form of government for your city-state. This change will impact how laws are made and may affect resource production and citizen happiness.
           </p>
-          
+
           <div className="space-y-3">
             <div 
               className={`p-3 rounded border cursor-pointer ${
@@ -56,7 +60,7 @@ const GovernmentModal: React.FC<GovernmentModalProps> = ({ onClose }) => {
                 Citizens debate and vote on laws every few turns. Happiness grows faster, but decisions are slower.
               </div>
             </div>
-            
+
             <div 
               className={`p-3 rounded border cursor-pointer ${
                 currentGovernment === GovernmentTypeValues.Oligarchy 
@@ -70,7 +74,7 @@ const GovernmentModal: React.FC<GovernmentModalProps> = ({ onClose }) => {
                 Policies are made behind closed doors by the elite. Economy grows faster, but civil unrest is possible.
               </div>
             </div>
-            
+
             <div 
               className={`p-3 rounded border cursor-pointer ${
                 currentGovernment === GovernmentTypeValues.Tyranny 
@@ -128,7 +132,7 @@ const GovernmentModal: React.FC<GovernmentModalProps> = ({ onClose }) => {
             </div>
           </div>
         </div>
-        
+
         <DialogFooter>
           <Button 
             variant="outline"

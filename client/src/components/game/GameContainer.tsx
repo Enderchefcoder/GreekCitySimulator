@@ -1,22 +1,27 @@
 import React, { useState, useEffect } from 'react';
+import { useGame } from '@/contexts/GameContext';
+import { useMultiplayer } from '@/contexts/MultiplayerContext';
 import GameBoard from './GameBoard';
 import GameSidebar from './GameSidebar';
+import GovernmentModal from './GovernmentModal';
 import EventModal from './EventModal';
 import EventLogModal from './EventLogModal';
-import GovernmentModal from './GovernmentModal';
-import { useGame } from '@/contexts/GameContext';
-import { CityStateName, GovernmentType } from '@shared/schema';
+import MultiplayerModal from './MultiplayerModal';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
+import { CityStateName } from '@shared/schema';
+import { GovernmentType } from '@shared/schema'; //Corrected import
+
 
 const GameContainer: React.FC = () => {
   const { game, startNewGame, loading } = useGame();
   const [showEventModal, setShowEventModal] = useState<boolean>(false);
   const [showEventLogModal, setShowEventLogModal] = useState<boolean>(false);
   const [showGovernmentModal, setShowGovernmentModal] = useState<boolean>(false);
+  const [showMultiplayerModal, setShowMultiplayerModal] = useState<boolean>(false);
   const [newGameSetup, setNewGameSetup] = useState<boolean>(true);
   const [selectedCity, setSelectedCity] = useState<CityStateName>('Athens' as CityStateName);
   const [selectedGovernment, setSelectedGovernment] = useState<GovernmentType>('Democracy' as GovernmentType);
+  const { session, isMyTurn, actionsRemaining, endTurn } = useMultiplayer();
 
   useEffect(() => {
     // Check if there's an active game
@@ -44,7 +49,7 @@ const GameContainer: React.FC = () => {
           <Card className="w-full max-w-md">
             <CardContent className="p-6">
               <h2 className="text-2xl cinzel font-bold text-[#8B4513] mb-6">Found Your City-State</h2>
-              
+
               <div className="mb-6">
                 <h3 className="cinzel font-bold text-[#8B4513] mb-2">Choose Your City</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
@@ -62,7 +67,7 @@ const GameContainer: React.FC = () => {
                   ))}
                 </div>
               </div>
-              
+
               <div className="mb-6">
                 <h3 className="cinzel font-bold text-[#8B4513] mb-2">Choose Your Government</h3>
                 <div className="space-y-2">
@@ -89,7 +94,7 @@ const GameContainer: React.FC = () => {
                   ))}
                 </div>
               </div>
-              
+
               <Button 
                 className="w-full bg-[#8B4513] hover:bg-[#6a340f] text-white"
                 onClick={handleStartNewGame}
@@ -100,7 +105,7 @@ const GameContainer: React.FC = () => {
             </CardContent>
           </Card>
         </main>
-        
+
         {/* Footer */}
         <footer className="bg-[#8B4513] text-[#F5F5DC] p-3 text-center">
           <p className="text-sm">Greek City-State Simulator</p>
@@ -125,8 +130,8 @@ const GameContainer: React.FC = () => {
             >
               <i className="fas fa-save mr-1"></i> Save
             </Button>
-            <Button className="bg-[#333333] hover:bg-gray-700 text-white px-3 py-1">
-              <i className="fas fa-cog"></i>
+            <Button onClick={() => setShowMultiplayerModal(true)} className="bg-[#333333] hover:bg-gray-700 text-white px-3 py-1">
+              <i className="fas fa-users"></i> Multiplayer
             </Button>
           </div>
         </div>
@@ -147,17 +152,30 @@ const GameContainer: React.FC = () => {
       </footer>
 
       {/* Modals */}
-      {showEventModal && (
-        <EventModal onClose={() => setShowEventModal(false)} />
-      )}
-      
-      {showEventLogModal && (
-        <EventLogModal onClose={() => setShowEventLogModal(false)} />
-      )}
-      
-      {showGovernmentModal && (
-        <GovernmentModal onClose={() => setShowGovernmentModal(false)} />
-      )}
+      <GovernmentModal
+        open={showGovernmentModal}
+        onOpenChange={setShowGovernmentModal}
+        currentGovernment={game.playerCityState.government}
+        //onChangeGovernment={handleGovernmentChange}  //This function is not defined in the original code
+      />
+
+      <EventModal
+        open={!!game?.event} //Added safety check for game?.event
+        onOpenChange={() => game && game.setEvent(null)} //Added safety check and used game.setEvent if available
+        event={game?.event} //Added safety check
+        //onMakeChoice={handleEventChoice} //This function is not defined in the original code
+      />
+
+      <EventLogModal 
+        open={showEventLogModal}
+        onOpenChange={setShowEventLogModal}
+        events={game?.events || []} //Added safety check and default empty array
+      />
+
+      <MultiplayerModal
+        open={showMultiplayerModal}
+        onOpenChange={setShowMultiplayerModal}
+      />
     </div>
   );
 };
