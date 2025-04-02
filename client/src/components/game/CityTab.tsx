@@ -3,7 +3,16 @@ import { useGame } from '@/contexts/GameContext';
 import CityMap from '@/components/ui/city-map';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { PolicyCategory } from '@shared/schema';
+// Local type definition instead of import
+type PolicyCategory = 'Economic' | 'Military' | 'Cultural' | 'Diplomatic';
+
+// Values for accessing policy categories
+const PolicyCategoryValues = {
+  Economic: 'Economic' as PolicyCategory,
+  Military: 'Military' as PolicyCategory,
+  Cultural: 'Cultural' as PolicyCategory,
+  Diplomatic: 'Diplomatic' as PolicyCategory
+};
 import { v4 as uuidv4 } from 'uuid';
 
 interface CityTabProps {
@@ -134,8 +143,13 @@ const CityTab: React.FC<CityTabProps> = ({ onOpenGovernmentModal }) => {
               className="bg-[#D2B48C] hover:bg-amber-200 p-3 rounded flex items-center justify-start border-[#8B4513]"
               onClick={() => {
                 // Find a city-state to trade with that we're not already trading with
+                // Define RelationshipStatusValues locally as needed
+                const RelationshipStatusValues = {
+                  War: 'War'
+                };
+                
                 const potentialTradePartner = game.relationships.find(r => 
-                  !r.treaties.includes('Trade') && r.status !== 'War'
+                  !r.treaties.includes('Trade') && r.status !== RelationshipStatusValues.War
                 );
                 
                 if (potentialTradePartner) {
@@ -163,7 +177,7 @@ const CityTab: React.FC<CityTabProps> = ({ onOpenGovernmentModal }) => {
                   className="justify-start border-[#8B4513] text-[#8B4513] hover:bg-[#D2B48C]"
                   onClick={() => handleBuildStructure(
                     'Agora', 
-                    'Economic' as PolicyCategory, 
+                    PolicyCategoryValues.Economic, 
                     300, 
                     { gold: 20, happiness: 10 }
                   )}
@@ -178,7 +192,7 @@ const CityTab: React.FC<CityTabProps> = ({ onOpenGovernmentModal }) => {
                   className="justify-start border-[#8B4513] text-[#8B4513] hover:bg-[#D2B48C]"
                   onClick={() => handleBuildStructure(
                     'Temple', 
-                    'Cultural' as PolicyCategory, 
+                    PolicyCategoryValues.Cultural, 
                     250, 
                     { happiness: 25 }
                   )}
@@ -193,7 +207,7 @@ const CityTab: React.FC<CityTabProps> = ({ onOpenGovernmentModal }) => {
                   className="justify-start border-[#8B4513] text-[#8B4513] hover:bg-[#D2B48C]"
                   onClick={() => handleBuildStructure(
                     'Barracks', 
-                    'Military' as PolicyCategory, 
+                    PolicyCategoryValues.Military, 
                     350, 
                     { military: 50 }
                   )}
@@ -208,7 +222,7 @@ const CityTab: React.FC<CityTabProps> = ({ onOpenGovernmentModal }) => {
                   className="justify-start border-[#8B4513] text-[#8B4513] hover:bg-[#D2B48C]"
                   onClick={() => handleBuildStructure(
                     'Farm', 
-                    'Economic' as PolicyCategory, 
+                    PolicyCategoryValues.Economic, 
                     200, 
                     { food: 30 }
                   )}
@@ -234,11 +248,11 @@ const CityTab: React.FC<CityTabProps> = ({ onOpenGovernmentModal }) => {
                 <div 
                   key={policy.id} 
                   className={`p-2 border-l-4 bg-[#D2B48C] bg-opacity-20 ${
-                    policy.category === 'Economic' 
+                    policy.category === PolicyCategoryValues.Economic 
                       ? 'border-[#B8860B]' 
-                      : policy.category === 'Military' 
+                      : policy.category === PolicyCategoryValues.Military 
                       ? 'border-[#FF9800]' 
-                      : policy.category === 'Cultural' 
+                      : policy.category === PolicyCategoryValues.Cultural 
                       ? 'border-[#4CAF50]'
                       : 'border-[#8B4513]'
                   }`}
@@ -273,7 +287,7 @@ const CityTab: React.FC<CityTabProps> = ({ onOpenGovernmentModal }) => {
                   name: 'Fair Taxation',
                   description: 'Moderate income, high citizen happiness',
                   effects: { gold: 10, happiness: 5 },
-                  category: 'Economic' as PolicyCategory,
+                  category: PolicyCategoryValues.Economic,
                   active: true
                 });
               }}

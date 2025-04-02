@@ -3,7 +3,16 @@ import { useGame } from '@/contexts/GameContext';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 // Using string instead of importing RelationshipStatus type
-type RelationshipStatus = string;
+type RelationshipStatus = 'Neutral' | 'Friendly' | 'Allied' | 'Hostile' | 'War';
+
+// Values for accessing relationship statuses
+const RelationshipStatusValues = {
+  Neutral: 'Neutral' as RelationshipStatus,
+  Friendly: 'Friendly' as RelationshipStatus,
+  Allied: 'Allied' as RelationshipStatus,
+  Hostile: 'Hostile' as RelationshipStatus,
+  War: 'War' as RelationshipStatus
+};
 
 const DiplomacyTab: React.FC = () => {
   const { game, declareWar, makePeace, establishTrade } = useGame();
@@ -12,13 +21,13 @@ const DiplomacyTab: React.FC = () => {
 
   const getRelationshipColor = (status: RelationshipStatus): string => {
     switch (status) {
-      case 'Allied':
+      case RelationshipStatusValues.Allied:
         return 'text-[#4CAF50]';
-      case 'Friendly':
+      case RelationshipStatusValues.Friendly:
         return 'text-[#2196F3]';
-      case 'Hostile':
+      case RelationshipStatusValues.Hostile:
         return 'text-[#FF9800]';
-      case 'War':
+      case RelationshipStatusValues.War:
         return 'text-[#B71C1C]';
       default:
         return 'text-[#333333]';
@@ -44,7 +53,7 @@ const DiplomacyTab: React.FC = () => {
                 <div key={relationship.cityState} className="border rounded p-3">
                   <div className="flex justify-between items-center mb-2">
                     <h4 className="font-bold cinzel">{relationship.cityState}</h4>
-                    <span className={`font-bold ${getRelationshipColor(relationship.status)}`}>
+                    <span className={`font-bold ${getRelationshipColor(relationship.status as RelationshipStatus)}`}>
                       {relationship.status}
                     </span>
                   </div>
@@ -71,7 +80,7 @@ const DiplomacyTab: React.FC = () => {
                   
                   {/* Action buttons */}
                   <div className="flex flex-wrap gap-2 mt-3">
-                    {relationship.status !== 'War' ? (
+                    {relationship.status !== RelationshipStatusValues.War ? (
                       <Button 
                         variant="outline"
                         size="sm"
@@ -91,7 +100,7 @@ const DiplomacyTab: React.FC = () => {
                       </Button>
                     )}
                     
-                    {relationship.status !== 'War' && (
+                    {relationship.status !== RelationshipStatusValues.War && (
                       <>
                         {!relationship.treaties.includes('Trade') && (
                           <Button 
@@ -104,7 +113,7 @@ const DiplomacyTab: React.FC = () => {
                           </Button>
                         )}
                         
-                        {relationship.status !== 'Allied' && (
+                        {relationship.status !== RelationshipStatusValues.Allied && (
                           <Button 
                             variant="outline"
                             size="sm"

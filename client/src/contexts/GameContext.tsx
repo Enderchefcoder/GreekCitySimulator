@@ -16,9 +16,25 @@ import {
   GovernmentType,
 } from '@/lib/game-enums-fix';
 
-// Add our own local types to avoid import issues
-type RelationshipStatus = string; 
-type MyGovernmentType = string;
+// Define our own local types to avoid import issues
+type RelationshipStatus = 'Neutral' | 'Friendly' | 'Allied' | 'Hostile' | 'War';
+type MyGovernmentType = 'Democracy' | 'Oligarchy' | 'Tyranny';
+
+// Values for accessing relationship statuses
+const RelationshipStatusValues = {
+  Neutral: 'Neutral' as RelationshipStatus,
+  Friendly: 'Friendly' as RelationshipStatus,
+  Allied: 'Allied' as RelationshipStatus,
+  Hostile: 'Hostile' as RelationshipStatus,
+  War: 'War' as RelationshipStatus
+};
+
+// Values for accessing government types
+const GovernmentTypeValues = {
+  Democracy: 'Democracy' as MyGovernmentType,
+  Oligarchy: 'Oligarchy' as MyGovernmentType,
+  Tyranny: 'Tyranny' as MyGovernmentType
+};
 import { apiRequest } from '@/lib/queryClient';
 import { useToast } from '@/hooks/use-toast';
 import { gameEngine } from '@/lib/game-engine';

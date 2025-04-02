@@ -2,7 +2,16 @@ import React from 'react';
 import { useGame } from '@/contexts/GameContext';
 import { CityStateName } from '@shared/schema';
 // Using string instead of importing RelationshipStatus type
-type RelationshipStatus = string;
+type RelationshipStatus = 'Neutral' | 'Friendly' | 'Allied' | 'Hostile' | 'War';
+
+// Values for accessing relationship statuses
+const RelationshipStatusValues = {
+  Neutral: 'Neutral' as RelationshipStatus,
+  Friendly: 'Friendly' as RelationshipStatus,
+  Allied: 'Allied' as RelationshipStatus,
+  Hostile: 'Hostile' as RelationshipStatus,
+  War: 'War' as RelationshipStatus
+};
 
 const CityMap: React.FC = () => {
   const { game } = useGame();
@@ -17,13 +26,13 @@ const CityMap: React.FC = () => {
     const relationship = game.relationships.find(r => r.cityState === cityName);
     if (relationship) {
       switch (relationship.status) {
-        case 'Allied':
+        case RelationshipStatusValues.Allied:
           return '#4CAF50'; // Green for allies
-        case 'Friendly':
+        case RelationshipStatusValues.Friendly:
           return '#2196F3'; // Blue for friendly
-        case 'Hostile':
+        case RelationshipStatusValues.Hostile:
           return '#FF9800'; // Orange for hostile
-        case 'War':
+        case RelationshipStatusValues.War:
           return '#B71C1C'; // Red for war
         default:
           return '#555'; // Gray for neutral

@@ -3,7 +3,16 @@ import { useGame } from '@/contexts/GameContext';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
-import { PolicyCategory } from '@shared/schema';
+// Local type definition instead of import
+type PolicyCategory = 'Economic' | 'Military' | 'Cultural' | 'Diplomatic';
+
+// Values for accessing policy categories
+const PolicyCategoryValues = {
+  Economic: 'Economic' as PolicyCategory,
+  Military: 'Military' as PolicyCategory,
+  Cultural: 'Cultural' as PolicyCategory,
+  Diplomatic: 'Diplomatic' as PolicyCategory
+};
 import { v4 as uuidv4 } from 'uuid';
 
 const EconomyTab: React.FC = () => {
@@ -24,7 +33,7 @@ const EconomyTab: React.FC = () => {
     
     // Add bonuses from policies
     const farmPolicies = game.policies.filter(
-      p => p.category === PolicyCategory.Economic && p.effects.food
+      p => p.category === PolicyCategoryValues.Economic && p.effects.food
     );
     
     const policyBonus = farmPolicies.reduce(
@@ -46,7 +55,7 @@ const EconomyTab: React.FC = () => {
   const applyTaxPolicy = () => {
     // Remove any existing tax policies
     const existingTaxPolicy = game.policies.find(p => 
-      p.name.includes('Taxation') && p.category === PolicyCategory.Economic
+      p.name.includes('Taxation') && p.category === PolicyCategoryValues.Economic
     );
     
     if (existingTaxPolicy) {
@@ -83,7 +92,7 @@ const EconomyTab: React.FC = () => {
         gold: calculateIncome(),
         happiness: calculateHappinessEffect()
       },
-      category: PolicyCategory.Economic,
+      category: PolicyCategoryValues.Economic,
       active: true
     };
     
