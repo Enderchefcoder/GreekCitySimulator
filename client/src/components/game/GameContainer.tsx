@@ -10,6 +10,7 @@ import MultiplayerModal from './MultiplayerModal';
 import { Button } from '@/components/ui/button';
 import { CityStateName } from '@shared/schema';
 import { GovernmentType } from '@shared/schema'; //Corrected import
+import { Card, CardContent } from '@/components/ui/card'; //Added Card import
 
 
 const GameContainer: React.FC = () => {
