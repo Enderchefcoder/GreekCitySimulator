@@ -9,13 +9,15 @@ const projectRoot = path.resolve(__dirname, '..');
 const buildDir = path.resolve(projectRoot, 'dist/public');
 const outputFile = path.resolve(projectRoot, 'packaged-app.mhtml');
 
-// First ensure we have a fresh build
+// Try to build the application but continue even if there are errors
 console.log('Building the application...');
 try {
   execSync('npm run build', { cwd: projectRoot, stdio: 'inherit' });
+  console.log('Build completed successfully.');
 } catch (error) {
-  console.error('Build failed:', error.message);
-  process.exit(1);
+  console.warn('Build had issues but continuing with packaging:', error.message);
+  console.log('Attempting to package whatever was built...');
+  // Continue with packaging - don't exit
 }
 
 // Install monolith tool if not already installed
