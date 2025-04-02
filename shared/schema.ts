@@ -31,16 +31,19 @@ export const ResourceTypeValues = {
 };
 
 // Define string literal type for government types
-export type GovernmentType = 'Democracy' | 'Oligarchy' | 'Tyranny';
+export type GovernmentType = 'Democracy' | 'Oligarchy' | 'Tyranny' | 'Aristocracy' | 'Timocracy' | 'Constitutional Monarchy';
 
 // Create Zod validator for GovernmentType
-export const GovernmentTypeSchema = z.enum(['Democracy', 'Oligarchy', 'Tyranny']);
+export const GovernmentTypeSchema = z.enum(['Democracy', 'Oligarchy', 'Tyranny', 'Aristocracy', 'Timocracy', 'Constitutional Monarchy']);
 
 // For direct value access
 export const GovernmentTypeValues = {
   Democracy: 'Democracy' as GovernmentType,
   Oligarchy: 'Oligarchy' as GovernmentType,
-  Tyranny: 'Tyranny' as GovernmentType
+  Tyranny: 'Tyranny' as GovernmentType,
+  Aristocracy: 'Aristocracy' as GovernmentType,
+  Timocracy: 'Timocracy' as GovernmentType,
+  ConstitutionalMonarchy: 'Constitutional Monarchy' as GovernmentType
 };
 
 // Not exporting this relationship status, only using it locally
@@ -82,13 +85,15 @@ export const PolicyCategoryValues = {
   Diplomatic: 'Diplomatic' as PolicyCategory
 };
 
-export type CityStateName = 'Athens' | 'Sparta' | 'Thebes' | 'Corinth';
-export const CityStateNameSchema = z.enum(['Athens', 'Sparta', 'Thebes', 'Corinth']);
+export type CityStateName = 'Athens' | 'Sparta' | 'Thebes' | 'Corinth' | 'Megara' | 'Argos';
+export const CityStateNameSchema = z.enum(['Athens', 'Sparta', 'Thebes', 'Corinth', 'Megara', 'Argos']);
 export const CityStateNameValues = {
   Athens: 'Athens' as CityStateName,
   Sparta: 'Sparta' as CityStateName,
   Thebes: 'Thebes' as CityStateName,
-  Corinth: 'Corinth' as CityStateName
+  Corinth: 'Corinth' as CityStateName,
+  Megara: 'Megara' as CityStateName,
+  Argos: 'Argos' as CityStateName
 };
 
 // Interfaces for the game

@@ -2,7 +2,10 @@
 export const GovernmentTypes = {
   Democracy: 'Democracy',
   Oligarchy: 'Oligarchy',
-  Tyranny: 'Tyranny'
+  Tyranny: 'Tyranny',
+  Aristocracy: 'Aristocracy',
+  Timocracy: 'Timocracy',
+  ConstitutionalMonarchy: 'Constitutional Monarchy'
 };
 
 export const PolicyCategories = {

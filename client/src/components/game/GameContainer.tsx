@@ -48,7 +48,7 @@ const GameContainer: React.FC = () => {
               <div className="mb-6">
                 <h3 className="cinzel font-bold text-[#8B4513] mb-2">Choose Your City</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                  {(['Athens', 'Sparta', 'Thebes', 'Corinth'] as const).map((city) => (
+                  {(['Athens', 'Sparta', 'Thebes', 'Corinth', 'Megara', 'Argos'] as const).map((city) => (
                     <Button
                       key={city}
                       variant={selectedCity === city ? "default" : "outline"}
@@ -66,7 +66,7 @@ const GameContainer: React.FC = () => {
               <div className="mb-6">
                 <h3 className="cinzel font-bold text-[#8B4513] mb-2">Choose Your Government</h3>
                 <div className="space-y-2">
-                  {(['Democracy', 'Oligarchy', 'Tyranny'] as const).map((govt) => (
+                  {(['Democracy', 'Oligarchy', 'Tyranny', 'Aristocracy', 'Timocracy', 'Constitutional Monarchy'] as const).map((govt) => (
                     <div 
                       key={govt}
                       className={`p-3 rounded border cursor-pointer ${

@@ -84,6 +84,48 @@ const GovernmentModal: React.FC<GovernmentModalProps> = ({ onClose }) => {
                 The ruler enacts laws with absolute power. Military grows faster, but citizen happiness decreases over time.
               </div>
             </div>
+
+            <div 
+              className={`p-3 rounded border cursor-pointer ${
+                currentGovernment === GovernmentTypeValues.Aristocracy 
+                  ? "bg-[#D2B48C] border-[#8B4513]" 
+                  : "bg-white border-[#D2B48C] hover:bg-[#f5f5f5]"
+              }`}
+              onClick={() => handleGovernmentChange(GovernmentTypeValues.Aristocracy)}
+            >
+              <div className="font-bold cinzel">{GovernmentTypeValues.Aristocracy}</div>
+              <div className="text-sm text-gray-700">
+                Rule by noble families. Culture and education thrive, but social mobility is limited.
+              </div>
+            </div>
+
+            <div 
+              className={`p-3 rounded border cursor-pointer ${
+                currentGovernment === GovernmentTypeValues.Timocracy 
+                  ? "bg-[#D2B48C] border-[#8B4513]" 
+                  : "bg-white border-[#D2B48C] hover:bg-[#f5f5f5]"
+              }`}
+              onClick={() => handleGovernmentChange(GovernmentTypeValues.Timocracy)}
+            >
+              <div className="font-bold cinzel">{GovernmentTypeValues.Timocracy}</div>
+              <div className="text-sm text-gray-700">
+                Rule by property owners. Economic growth and stability increase, but inequality rises.
+              </div>
+            </div>
+
+            <div 
+              className={`p-3 rounded border cursor-pointer ${
+                currentGovernment === GovernmentTypeValues.ConstitutionalMonarchy 
+                  ? "bg-[#D2B48C] border-[#8B4513]" 
+                  : "bg-white border-[#D2B48C] hover:bg-[#f5f5f5]"
+              }`}
+              onClick={() => handleGovernmentChange(GovernmentTypeValues.ConstitutionalMonarchy)}
+            >
+              <div className="font-bold cinzel">Constitutional Monarchy</div>
+              <div className="text-sm text-gray-700">
+                Balanced rule between monarch and assembly. Provides stability and moderate growth in all areas.
+              </div>
+            </div>
           </div>
         </div>
         
