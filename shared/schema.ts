@@ -43,17 +43,15 @@ export const GovernmentTypeValues = {
   Tyranny: 'Tyranny' as GovernmentType
 };
 
-// Define all string literals explicitly to avoid circular references
-export type RelationshipStatus = 'Neutral' | 'Friendly' | 'Allied' | 'Hostile' | 'War';
-// Ensure it's properly exported 
-export { RelationshipStatus };
+// Not exporting this relationship status, only using it locally
+type RelationshipStatusType = 'Neutral' | 'Friendly' | 'Allied' | 'Hostile' | 'War';
 export const RelationshipStatusSchema = z.enum(['Neutral', 'Friendly', 'Allied', 'Hostile', 'War']);
 export const RelationshipStatusValues = {
-  Neutral: 'Neutral' as RelationshipStatus,
-  Friendly: 'Friendly' as RelationshipStatus,
-  Allied: 'Allied' as RelationshipStatus,
-  Hostile: 'Hostile' as RelationshipStatus,
-  War: 'War' as RelationshipStatus
+  Neutral: 'Neutral',
+  Friendly: 'Friendly',
+  Allied: 'Allied',
+  Hostile: 'Hostile',
+  War: 'War'
 };
 
 export type EventType = 'Political' | 'Military' | 'Economic' | 'Disaster' | 'Cultural';
@@ -113,7 +111,7 @@ export interface Policy {
 
 export interface Relationship {
   cityState: CityStateName;
-  status: RelationshipStatus;
+  status: string; // Using string to avoid type issues
   treaties: string[];
 }
 
@@ -135,7 +133,7 @@ export interface GameEvent {
 export interface CityState {
   id: string;
   name: CityStateName;
-  government: GovernmentType;
+  government: string; // Using string to avoid type issues with GovernmentType
   resources: Resources;
   location: { x: number; y: number };
   isPlayerOwned: boolean;

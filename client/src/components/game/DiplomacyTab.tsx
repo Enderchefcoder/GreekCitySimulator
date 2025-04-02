@@ -2,7 +2,8 @@ import React from 'react';
 import { useGame } from '@/contexts/GameContext';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { RelationshipStatus } from '@shared/schema';
+// Using string instead of importing RelationshipStatus type
+type RelationshipStatus = string;
 
 const DiplomacyTab: React.FC = () => {
   const { game, declareWar, makePeace, establishTrade } = useGame();

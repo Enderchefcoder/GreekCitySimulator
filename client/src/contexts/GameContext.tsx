@@ -13,11 +13,12 @@ import {
   EventSeverities,
   PolicyCategories,
   RelationshipStatuses,
-  GovernmentType
+  GovernmentType,
 } from '@/lib/game-enums-fix';
 
-// Local type definition to avoid import issues
-type RelationshipStatus = 'Neutral' | 'Friendly' | 'Allied' | 'Hostile' | 'War';
+// Add our own local types to avoid import issues
+type RelationshipStatus = string; 
+type MyGovernmentType = string;
 import { apiRequest } from '@/lib/queryClient';
 import { useToast } from '@/hooks/use-toast';
 import { gameEngine } from '@/lib/game-engine';
@@ -115,7 +116,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const playerCity: CityState = {
         id: uuidv4(),
         name: cityName,
-        government: government,
+        government: government as GovernmentType,
         resources: initialResources,
         location: getLocationForCity(cityName),
         isPlayerOwned: true

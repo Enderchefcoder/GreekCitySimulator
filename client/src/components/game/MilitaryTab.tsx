@@ -3,7 +3,8 @@ import { useGame } from '@/contexts/GameContext';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
-import { RelationshipStatus } from '@shared/schema';
+// Using string instead of importing RelationshipStatus type
+type RelationshipStatus = string;
 
 const MilitaryTab: React.FC = () => {
   const { game, trainUnits } = useGame();
@@ -62,10 +63,10 @@ const MilitaryTab: React.FC = () => {
           
           <div className="mb-4">
             <h4 className="font-bold mb-2">Active Conflicts</h4>
-            {game.relationships.filter(r => r.status === RelationshipStatus.War).length > 0 ? (
+            {game.relationships.filter(r => r.status === 'War').length > 0 ? (
               <div className="space-y-2">
                 {game.relationships
-                  .filter(r => r.status === RelationshipStatus.War)
+                  .filter(r => r.status === 'War')
                   .map(relationship => {
                     const enemyCity = game.otherCityStates.find(city => city.name === relationship.cityState);
                     if (!enemyCity) return null;
@@ -160,7 +161,7 @@ const MilitaryTab: React.FC = () => {
                   <div className="flex justify-between items-center mb-2">
                     <h4 className="font-bold cinzel">{city.name}</h4>
                     <span className={`font-bold ${
-                      relationship?.status === RelationshipStatus.War 
+                      relationship?.status === 'War' 
                         ? 'text-[#B71C1C]' 
                         : 'text-gray-500'
                     }`}>
@@ -179,7 +180,7 @@ const MilitaryTab: React.FC = () => {
                   </div>
                   
                   <div className="flex space-x-2 mt-3">
-                    {relationship?.status !== RelationshipStatus.War ? (
+                    {relationship?.status !== 'War' ? (
                       <Button 
                         variant="outline" 
                         size="sm" 
