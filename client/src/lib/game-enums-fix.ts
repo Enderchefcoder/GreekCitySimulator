@@ -1,45 +1,43 @@
-// This file creates properly typed values for enums for use in game-engine.ts and similar files
-import { 
-  GovernmentType, GovernmentTypeValues,
-  PolicyCategory, PolicyCategoryValues, 
-  EventType, EventTypeValues,
-  EventSeverity, EventSeverityValues,
-  RelationshipStatus, RelationshipStatusValues
-} from '@shared/schema';
-
-// Export enum values for use in other files
+// Hard-coded enum values for use in the game
 export const GovernmentTypes = {
-  Democracy: GovernmentTypeValues.Democracy,
-  Oligarchy: GovernmentTypeValues.Oligarchy,
-  Tyranny: GovernmentTypeValues.Tyranny
+  Democracy: 'Democracy',
+  Oligarchy: 'Oligarchy',
+  Tyranny: 'Tyranny'
 };
 
 export const PolicyCategories = {
-  Economic: PolicyCategoryValues.Economic,
-  Military: PolicyCategoryValues.Military,
-  Cultural: PolicyCategoryValues.Cultural,
-  Diplomatic: PolicyCategoryValues.Diplomatic
+  Economic: 'Economic',
+  Military: 'Military',
+  Cultural: 'Cultural',
+  Diplomatic: 'Diplomatic'
 };
 
 export const EventTypes = {
-  Political: EventTypeValues.Political,
-  Military: EventTypeValues.Military,
-  Economic: EventTypeValues.Economic,
-  Disaster: EventTypeValues.Disaster,
-  Cultural: EventTypeValues.Cultural
+  Political: 'Political',
+  Military: 'Military',
+  Economic: 'Economic',
+  Disaster: 'Disaster',
+  Cultural: 'Cultural'
 };
 
 export const EventSeverities = {
-  Positive: EventSeverityValues.Positive,
-  Neutral: EventSeverityValues.Neutral,
-  Warning: EventSeverityValues.Warning,
-  Danger: EventSeverityValues.Danger
+  Positive: 'Positive',
+  Neutral: 'Neutral',
+  Warning: 'Warning',
+  Danger: 'Danger'
 };
 
 export const RelationshipStatuses = {
-  Neutral: RelationshipStatusValues.Neutral,
-  Friendly: RelationshipStatusValues.Friendly,
-  Allied: RelationshipStatusValues.Allied,
-  Hostile: RelationshipStatusValues.Hostile,
-  War: RelationshipStatusValues.War
+  Neutral: 'Neutral',
+  Friendly: 'Friendly',
+  Allied: 'Allied',
+  Hostile: 'Hostile',
+  War: 'War'
 };
+
+// Re-export the types for usage
+export type GovernmentType = typeof GovernmentTypes[keyof typeof GovernmentTypes];
+export type PolicyCategory = typeof PolicyCategories[keyof typeof PolicyCategories];
+export type EventType = typeof EventTypes[keyof typeof EventTypes];
+export type EventSeverity = typeof EventSeverities[keyof typeof EventSeverities];
+export type RelationshipStatus = typeof RelationshipStatuses[keyof typeof RelationshipStatuses];

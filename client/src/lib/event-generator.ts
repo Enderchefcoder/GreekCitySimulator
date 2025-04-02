@@ -1,19 +1,21 @@
 import { 
   GameState, 
-  GameEvent, 
-  EventType, 
-  EventSeverity, 
+  GameEvent,
   ResourceType,
   Resources
 } from '@shared/schema';
+import {
+  EventTypes,
+  EventSeverities
+} from './game-enums-fix';
 import { v4 as uuidv4 } from 'uuid';
 
 // Event templates for different event types
 interface EventTemplate {
   title: string;
   description: string;
-  type: EventType;
-  severity: EventSeverity;
+  type: string;
+  severity: string;
   effects?: Partial<Record<ResourceType, number>>;
   choices?: {
     text: string;
@@ -27,8 +29,8 @@ const disasterEvents: EventTemplate[] = [
   {
     title: 'Earthquake',
     description: 'A powerful earthquake has struck your city-state, causing damage to buildings and infrastructure.',
-    type: EventType.Disaster,
-    severity: EventSeverity.Danger,
+    type: EventTypes.Disaster,
+    severity: EventSeverities.Danger,
     effects: {
       gold: -200,
       population: -100,
@@ -38,8 +40,8 @@ const disasterEvents: EventTemplate[] = [
   {
     title: 'Plague',
     description: 'A deadly plague is spreading through your city. Citizens are falling ill and dying.',
-    type: EventType.Disaster,
-    severity: EventSeverity.Danger,
+    type: EventTypes.Disaster,
+    severity: EventSeverities.Danger,
     effects: {
       population: -300,
       happiness: -15
@@ -62,8 +64,8 @@ const disasterEvents: EventTemplate[] = [
   {
     title: 'Drought',
     description: 'A severe drought has affected your farmlands. Food production is significantly reduced.',
-    type: EventType.Disaster,
-    severity: EventSeverity.Warning,
+    type: EventTypes.Disaster,
+    severity: EventSeverities.Warning,
     effects: {
       food: -200,
       happiness: -5
@@ -72,8 +74,8 @@ const disasterEvents: EventTemplate[] = [
   {
     title: 'Storm',
     description: 'A powerful storm has damaged your harbor and coastal buildings.',
-    type: EventType.Disaster,
-    severity: EventSeverity.Warning,
+    type: EventTypes.Disaster,
+    severity: EventSeverities.Warning,
     effects: {
       gold: -150,
       food: -50
@@ -85,8 +87,8 @@ const politicalEvents: EventTemplate[] = [
   {
     title: 'Political Scandal',
     description: 'A scandal involving prominent politicians has erupted in your city-state.',
-    type: EventType.Political,
-    severity: EventSeverity.Warning,
+    type: EventTypes.Political,
+    severity: EventSeverities.Warning,
     effects: {
       happiness: -10
     },
@@ -108,8 +110,8 @@ const politicalEvents: EventTemplate[] = [
   {
     title: 'Foreign Delegates',
     description: 'Delegates from a distant land have arrived to establish diplomatic relations.',
-    type: EventType.Political,
-    severity: EventSeverity.Positive,
+    type: EventTypes.Political,
+    severity: EventSeverities.Positive,
     choices: [
       {
         text: 'Welcome them warmly',
@@ -128,8 +130,8 @@ const politicalEvents: EventTemplate[] = [
   {
     title: 'Civil Unrest',
     description: 'Citizens are protesting against some of your policies.',
-    type: EventType.Political,
-    severity: EventSeverity.Warning,
+    type: EventTypes.Political,
+    severity: EventSeverities.Warning,
     condition: (gameState) => gameState.playerCityState.resources.happiness < 40,
     effects: {
       happiness: -5
@@ -155,8 +157,8 @@ const militaryEvents: EventTemplate[] = [
   {
     title: 'Military Parade',
     description: 'Your generals suggest holding a military parade to boost morale.',
-    type: EventType.Military,
-    severity: EventSeverity.Positive,
+    type: EventTypes.Military,
+    severity: EventSeverities.Positive,
     choices: [
       {
         text: 'Hold a grand parade',
@@ -175,8 +177,8 @@ const militaryEvents: EventTemplate[] = [
   {
     title: 'Foreign Mercenaries',
     description: 'A group of skilled foreign mercenaries offers their services.',
-    type: EventType.Military,
-    severity: EventSeverity.Neutral,
+    type: EventTypes.Military,
+    severity: EventSeverities.Neutral,
     choices: [
       {
         text: 'Hire them',
@@ -195,8 +197,8 @@ const militaryEvents: EventTemplate[] = [
   {
     title: 'Military Innovations',
     description: 'Your military commanders have developed new tactics and equipment.',
-    type: EventType.Military,
-    severity: EventSeverity.Positive,
+    type: EventTypes.Military,
+    severity: EventSeverities.Positive,
     choices: [
       {
         text: 'Invest heavily',
@@ -214,8 +216,8 @@ const economicEvents: EventTemplate[] = [
   {
     title: 'Economic Boom',
     description: 'Your economy is thriving due to favorable conditions.',
-    type: EventType.Economic,
-    severity: EventSeverity.Positive,
+    type: EventTypes.Economic,
+    severity: EventSeverities.Positive,
     effects: {
       gold: 200,
       happiness: 5
@@ -224,8 +226,8 @@ const economicEvents: EventTemplate[] = [
   {
     title: 'Trade Opportunity',
     description: 'Merchants propose a new trade venture that could be profitable.',
-    type: EventType.Economic,
-    severity: EventSeverity.Neutral,
+    type: EventTypes.Economic,
+    severity: EventSeverities.Neutral,
     choices: [
       {
         text: 'Invest heavily',
@@ -244,8 +246,8 @@ const economicEvents: EventTemplate[] = [
   {
     title: 'Market Crash',
     description: 'The market for your main export has crashed, affecting your economy.',
-    type: EventType.Economic,
-    severity: EventSeverity.Warning,
+    type: EventTypes.Economic,
+    severity: EventSeverities.Warning,
     effects: {
       gold: -150,
       happiness: -5
@@ -257,8 +259,8 @@ const culturalEvents: EventTemplate[] = [
   {
     title: 'Olympic Games',
     description: 'Your athletes are preparing to compete in the Olympic Games.',
-    type: EventType.Cultural,
-    severity: EventSeverity.Positive,
+    type: EventTypes.Cultural,
+    severity: EventSeverities.Positive,
     choices: [
       {
         text: 'Invest in training',
@@ -277,8 +279,8 @@ const culturalEvents: EventTemplate[] = [
   {
     title: 'Famous Philosopher',
     description: 'A famous philosopher wants to establish a school in your city.',
-    type: EventType.Cultural,
-    severity: EventSeverity.Positive,
+    type: EventTypes.Cultural,
+    severity: EventSeverities.Positive,
     choices: [
       {
         text: 'Fund the school generously',
@@ -297,8 +299,8 @@ const culturalEvents: EventTemplate[] = [
   {
     title: 'Cultural Festival',
     description: 'Your citizens want to hold a grand cultural festival.',
-    type: EventType.Cultural,
-    severity: EventSeverity.Positive,
+    type: EventTypes.Cultural,
+    severity: EventSeverities.Positive,
     choices: [
       {
         text: 'Fund a magnificent festival',

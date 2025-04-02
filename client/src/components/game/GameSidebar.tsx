@@ -1,7 +1,8 @@
 import React from 'react';
 import { useGame } from '@/contexts/GameContext';
 import { Button } from '@/components/ui/button';
-import { GameEvent, EventSeverity } from '@shared/schema';
+import { GameEvent } from '@shared/schema';
+import { EventSeverities } from '@/lib/game-enums-fix';
 
 interface GameSidebarProps {
   onOpenEventLog: () => void;
@@ -15,7 +16,7 @@ const GameSidebar: React.FC<GameSidebarProps> = ({ onOpenEventLog, onEventChoice
     return <div>Loading...</div>;
   }
 
-  const getSeverityClass = (severity: EventSeverity): string => {
+  const getSeverityClass = (severity: string): string => {
     switch (severity) {
       case 'Positive':
         return 'text-[#4CAF50]';

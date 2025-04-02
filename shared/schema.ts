@@ -43,8 +43,10 @@ export const GovernmentTypeValues = {
   Tyranny: 'Tyranny' as GovernmentType
 };
 
-// Define string literal types for all enums
+// Define all string literals explicitly to avoid circular references
 export type RelationshipStatus = 'Neutral' | 'Friendly' | 'Allied' | 'Hostile' | 'War';
+// Ensure it's properly exported 
+export { RelationshipStatus };
 export const RelationshipStatusSchema = z.enum(['Neutral', 'Friendly', 'Allied', 'Hostile', 'War']);
 export const RelationshipStatusValues = {
   Neutral: 'Neutral' as RelationshipStatus,
@@ -121,8 +123,8 @@ export interface GameEvent {
   year: number;
   title: string;
   description: string;
-  type: EventType;
-  severity: EventSeverity;
+  type: string;
+  severity: string;
   effects?: { [key in ResourceType]?: number };
   choices?: {
     text: string;

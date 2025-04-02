@@ -2,7 +2,8 @@ import React from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { useGame } from '@/contexts/GameContext';
-import { EventSeverity, GameEvent } from '@shared/schema';
+import { GameEvent } from '@shared/schema';
+import { EventSeverities } from '@/lib/game-enums-fix';
 
 interface EventLogModalProps {
   onClose: () => void;
@@ -27,7 +28,7 @@ const EventLogModal: React.FC<EventLogModalProps> = ({ onClose }) => {
     .map(Number)
     .sort((a, b) => b - a);
 
-  const getSeverityClass = (severity: EventSeverity): string => {
+  const getSeverityClass = (severity: string): string => {
     switch (severity) {
       case 'Positive':
         return 'text-[#4CAF50]';
