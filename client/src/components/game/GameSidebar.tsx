@@ -6,16 +6,20 @@ import { Button } from '@/components/ui/button';
 import { GameEvent } from '@shared/schema';
 import { EventSeverities } from '@/lib/game-enums-fix';
 import { saveAs } from 'file-saver';
+import { EventLogModal } from './EventLogModal';
+import { EventChoiceModal } from './EventChoiceModal';
 
 interface GameSidebarProps {
-  onOpenEventLog: () => void;
-  onEventChoice: () => void;
+  // onOpenEventLog: () => void;
+  // onEventChoice: () => void;
 }
 
-const GameSidebar: React.FC<GameSidebarProps> = ({ onOpenEventLog, onEventChoice }) => {
+const GameSidebar: React.FC<GameSidebarProps> = () => {
   const { game, endTurn } = useGame();
   const { session, isMyTurn, actionsRemaining, endTurn: endMultiplayerTurn } = useMultiplayer();
   const [showHappinessDetails, setShowHappinessDetails] = React.useState(false);
+  const [isEventLogOpen, setIsEventLogOpen] = React.useState(false);
+  const [isEventChoiceOpen, setIsEventChoiceOpen] = React.useState(false);
 
   if (!game) {
     return <div>Loading...</div>;
@@ -62,6 +66,22 @@ const GameSidebar: React.FC<GameSidebarProps> = ({ onOpenEventLog, onEventChoice
     saveAs(blob, `greek-city-history-turn-${game.turn}.json`);
   };
 
+  const handleOpenEventLog = () => {
+    setIsEventLogOpen(true);
+  };
+
+  const handleCloseEventLog = () => {
+    setIsEventLogOpen(false);
+  };
+
+  const handleEventChoice = () => {
+    setIsEventChoiceOpen(true);
+  };
+
+  const handleCloseEventChoice = () => {
+    setIsEventChoiceOpen(false);
+  };
+
   return (
     <div className="w-full lg:w-1/4">
       {/* Turn Information */}
@@ -106,10 +126,10 @@ const GameSidebar: React.FC<GameSidebarProps> = ({ onOpenEventLog, onEventChoice
           <h3 className="text-lg cinzel font-bold text-[#8B4513]">Events</h3>
           <button 
             className="text-[#B8860B] hover:text-amber-700"
-            onClick={onOpenEventLog}
+            onClick={handleOpenEventLog}
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253" />
             </svg> Full Log
           </button>
         </div>
@@ -131,7 +151,7 @@ const GameSidebar: React.FC<GameSidebarProps> = ({ onOpenEventLog, onEventChoice
                   <Button 
                     variant="outline" 
                     className="w-full text-sm border-[#8B4513] text-[#8B4513] hover:bg-[#D2B48C]"
-                    onClick={onEventChoice}
+                    onClick={handleEventChoice}
                   >
                     Make a decision...
                   </Button>
@@ -222,6 +242,14 @@ const GameSidebar: React.FC<GameSidebarProps> = ({ onOpenEventLog, onEventChoice
           </div>
         )}
       </div>
+      <EventLogModal 
+        open={isEventLogOpen} 
+        onOpenChange={handleCloseEventLog} 
+      />
+      <EventChoiceModal 
+        open={isEventChoiceOpen} 
+        onOpenChange={handleCloseEventChoice} 
+      />
     </div>
   );
 };

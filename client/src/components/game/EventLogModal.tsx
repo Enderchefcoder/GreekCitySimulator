@@ -6,10 +6,11 @@ import { GameEvent } from '@shared/schema';
 import { EventSeverities } from '@/lib/game-enums-fix';
 
 interface EventLogModalProps {
-  onClose: () => void;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
 }
 
-const EventLogModal: React.FC<EventLogModalProps> = ({ onClose }) => {
+const EventLogModal: React.FC<EventLogModalProps> = ({ open, onOpenChange }) => {
   const { game, exportHistory } = useGame();
 
   if (!game) return null;
@@ -44,13 +45,13 @@ const EventLogModal: React.FC<EventLogModalProps> = ({ onClose }) => {
   };
 
   return (
-    <Dialog open onOpenChange={() => onClose()}>
-      <DialogContent className="bg-[#F5F5DC] max-w-4xl h-[75vh]">
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="bg-[#F5F5DC] max-w-4xl h-[75vh]" aria-describedby="event-log-description">
         <DialogHeader>
           <DialogTitle className="text-2xl cinzel font-bold text-[#8B4513]">City History</DialogTitle>
         </DialogHeader>
         
-        <div className="overflow-y-auto flex-grow pr-2">
+        <div className="overflow-y-auto flex-grow pr-2" id="event-log-description">
           {sortedYears.map(year => (
             <div key={year} className="mb-6">
               <h4 className="text-lg cinzel text-[#8B4513] border-b border-[#B8860B] pb-1 mb-3">
@@ -94,7 +95,7 @@ const EventLogModal: React.FC<EventLogModalProps> = ({ onClose }) => {
           </Button>
           <Button 
             className="bg-[#8B4513] hover:bg-amber-800 text-white cinzel"
-            onClick={onClose}
+            onClick={() => onOpenChange(false)}
           >
             Close
           </Button>
