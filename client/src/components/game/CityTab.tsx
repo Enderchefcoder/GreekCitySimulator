@@ -1,304 +1,229 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useGame } from '@/contexts/GameContext';
-import CityMap from '@/components/ui/city-map';
+import { useMultiplayer } from '@/contexts/MultiplayerContext';
+import { ResourceTypeValues } from '@shared/schema';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-// Local type definition instead of import
-type PolicyCategory = 'Economic' | 'Military' | 'Cultural' | 'Diplomatic';
+import { GameEvent } from '@shared/schema';
+import { EventSeverities } from '@/lib/game-enums-fix';
+import { saveAs } from 'file-saver';
 
-// Values for accessing policy categories
-const PolicyCategoryValues = {
-  Economic: 'Economic' as PolicyCategory,
-  Military: 'Military' as PolicyCategory,
-  Cultural: 'Cultural' as PolicyCategory,
-  Diplomatic: 'Diplomatic' as PolicyCategory
-};
-import { v4 as uuidv4 } from 'uuid';
-
-interface CityTabProps {
-  onOpenGovernmentModal: () => void;
+interface GameSidebarProps {
+  onOpenEventLog: () => void;
+  onEventChoice: () => void;
 }
 
-const CityTab: React.FC<CityTabProps> = ({ onOpenGovernmentModal }) => {
-  const { game, addPolicy, removePolicy, buildStructure, holdFestival, trainUnits, establishTrade } = useGame();
-  const [buildMenuOpen, setBuildMenuOpen] = useState(false);
-  
-  if (!game) return null;
+const GameSidebar: React.FC<GameSidebarProps> = ({ onOpenEventLog, onEventChoice }) => {
+  const { game, endTurn } = useGame();
+  const { session, isMyTurn, actionsRemaining, endTurn: endMultiplayerTurn } = useMultiplayer();
+  const [showHappinessDetails, setShowHappinessDetails] = React.useState(false);
 
-  const handleBuildStructure = (
-    structureName: string, 
-    category: PolicyCategory,
-    goldCost: number, 
-    effects: Record<string, number>
-  ) => {
-    // Create a new policy representing the structure
-    const policy = {
-      id: uuidv4(),
-      name: structureName,
-      description: `This structure provides various bonuses for ${category.toLowerCase()}.`,
-      effects,
-      category,
-      active: true
+  if (!game) {
+    return <div>Loading...</div>;
+  }
+
+  const getSeverityClass = (severity: string): string => {
+    switch (severity) {
+      case 'Positive':
+        return 'text-[#4CAF50]';
+      case 'Neutral':
+        return '';
+      case 'Warning':
+        return 'text-[#FF9800]';
+      case 'Danger':
+        return 'text-[#B71C1C]';
+      default:
+        return '';
+    }
+  };
+
+  const handleEndTurn = () => {
+    if (session) {
+      endMultiplayerTurn();
+    } else {
+      endTurn();
+    }
+  };
+
+  const exportHistory = () => {
+    const { game } = useGame();
+    if (!game) return;
+
+    const historyData = {
+      cityState: game.playerCityState.name,
+      startYear: game.startYear,
+      endYear: game.year,
+      turns: game.turn,
+      events: game.events,
+      resources: game.playerCityState.resources,
+      policies: game.playerCityState.policies
     };
-    
-    // Build the structure (deduct costs)
-    buildStructure(structureName, { 
-      gold: goldCost, 
-      food: 0, 
-      population: 0, 
-      military: 0, 
-      happiness: 0 
-    });
-    
-    // Add the policy
-    addPolicy(policy);
-    
-    // Close the build menu
-    setBuildMenuOpen(false);
+
+    const blob = new Blob([JSON.stringify(historyData, null, 2)], { type: 'application/json' });
+    saveAs(blob, `greek-city-history-turn-${game.turn}.json`);
   };
 
   return (
-    <div className="space-y-4">
-      {/* Map View */}
-      <Card>
-        <CardContent className="p-4">
-          <h3 className="text-lg cinzel font-bold text-[#8B4513] mb-3">City Map</h3>
-          <CityMap />
-        </CardContent>
-      </Card>
-      
-      {/* City Actions */}
-      <Card>
-        <CardContent className="p-4">
-          <h3 className="text-lg cinzel font-bold text-[#8B4513] mb-3">City Management</h3>
-          
-          {/* Government Type Area */}
-          <div className="mb-4 p-3 bg-[#D2B48C] bg-opacity-30 rounded">
-            <div className="flex justify-between items-center">
-              <div>
-                <h4 className="cinzel font-bold">Government: <span>{game.playerCityState.government}</span></h4>
-                <p className="text-sm text-[#333333]">
-                  {game.playerCityState.government === 'Democracy' 
-                    ? 'In a democracy, citizens vote on new laws every few turns.'
-                    : game.playerCityState.government === 'Oligarchy'
-                    ? 'In an oligarchy, policies are made behind closed doors by the elite.'
-                    : 'In a tyranny, the ruler enacts laws with absolute power.'}
-                </p>
+    <div className="w-full lg:w-1/4">
+      {/* Turn Information */}
+      <div className="bg-[#8B4513] text-[#F5F5DC] rounded-lg shadow-md p-4 mb-4">
+        <div className="flex justify-between items-center mb-3">
+          <h3 className="cinzel font-bold">Turn: <span>{game.turn}</span></h3>
+          <span className="text-sm">Year: <span>{game.year} BCE</span></span>
+        </div>
+        <Button 
+          className="w-full bg-[#B8860B] hover:bg-amber-700 text-white py-2 rounded cinzel font-bold"
+          onClick={handleEndTurn}
+          disabled={session && (!isMyTurn || actionsRemaining > 0)}
+        >
+          {session 
+            ? isMyTurn 
+              ? `End Turn (${actionsRemaining} actions left)` 
+              : "Waiting for other player" 
+            : "End Turn"
+          }
+        </Button>
+      </div>
+
+      {/* Multiplayer status */}
+      {session && (
+        <div className="mt-4 p-3 bg-[#D2B48C] rounded">
+          <h3 className="text-sm font-bold mb-1">Multiplayer Mode</h3>
+          <p className="text-xs mb-2">
+            {isMyTurn 
+              ? `Your turn - ${actionsRemaining} actions remaining` 
+              : "Waiting for other player's turn"}
+          </p>
+          <div className="text-xs">
+            Players: {session.players.map(p => p.username).join(', ')}
+          </div>
+        </div>
+      )}
+
+
+      {/* Event Log */}
+      <div className="bg-white rounded-lg shadow-md p-4">
+        <div className="flex justify-between items-center mb-2">
+          <h3 className="text-lg cinzel font-bold text-[#8B4513]">Events</h3>
+          <button 
+            className="text-[#B8860B] hover:text-amber-700"
+            onClick={onOpenEventLog}
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253" />
+            </svg> Full Log
+          </button>
+        </div>
+
+        <div className="max-h-[70vh] overflow-y-auto scrollbar-thin scrollbar-thumb-[#8B4513] scrollbar-track-[#D2B48C]">
+          {game.events.slice(0, 5).map((event: GameEvent) => (
+            <div key={event.id} className="event-card mb-3 p-3 rounded border border-[#D2B48C]">
+              <div className="flex justify-between">
+                <span className="text-xs text-[#333333]">Turn {event.turn}</span>
+                <span className="text-xs font-bold text-[#8B4513]">{event.year} BCE</span>
               </div>
-              <Button 
-                className="bg-[#8B4513] hover:bg-amber-800 text-white px-3 py-1 text-sm"
-                onClick={onOpenGovernmentModal}
-              >
-                Change Government
-              </Button>
+              <h4 className={`cinzel font-bold mb-1 ${getSeverityClass(event.severity)}`}>
+                {event.title}
+              </h4>
+              <p className="text-sm">{event.description}</p>
+
+              {event.choices && event.choices.length > 0 && (
+                <div className="mt-2">
+                  <Button 
+                    variant="outline" 
+                    className="w-full text-sm border-[#8B4513] text-[#8B4513] hover:bg-[#D2B48C]"
+                    onClick={onEventChoice}
+                  >
+                    Make a decision...
+                  </Button>
+                </div>
+              )}
             </div>
-          </div>
-          
-          {/* Available Actions */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            <Button 
-              variant="outline"
-              className="bg-[#D2B48C] hover:bg-amber-200 p-3 rounded flex items-center justify-start border-[#8B4513]"
-              onClick={() => setBuildMenuOpen(!buildMenuOpen)}
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" className="text-[#8B4513] mr-2 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-              </svg>
-              <div className="text-left">
-                <div className="cinzel font-bold">Build Structure</div>
-                <div className="text-xs text-[#333333]">Enhance your city with new buildings</div>
-              </div>
-            </Button>
-            
-            <Button 
-              variant="outline"
-              className="bg-[#D2B48C] hover:bg-amber-200 p-3 rounded flex items-center justify-start border-[#8B4513]"
-              onClick={holdFestival}
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" className="text-[#8B4513] mr-2 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              <div className="text-left">
-                <div className="cinzel font-bold">Hold Festival</div>
-                <div className="text-xs text-[#333333]">Boost citizen happiness (+15)</div>
-              </div>
-            </Button>
-            
-            <Button 
-              variant="outline"
-              className="bg-[#D2B48C] hover:bg-amber-200 p-3 rounded flex items-center justify-start border-[#8B4513]"
-              onClick={() => trainUnits(100, 200)}
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" className="text-[#8B4513] mr-2 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-              </svg>
-              <div className="text-left">
-                <div className="cinzel font-bold">Train Military Units</div>
-                <div className="text-xs text-[#333333]">Strengthen your army</div>
-              </div>
-            </Button>
-            
-            <Button 
-              variant="outline"
-              className="bg-[#D2B48C] hover:bg-amber-200 p-3 rounded flex items-center justify-start border-[#8B4513]"
-              onClick={() => {
-                // Find a city-state to trade with that we're not already trading with
-                // Define RelationshipStatusValues locally as needed
-                const RelationshipStatusValues = {
-                  War: 'War'
-                };
-                
-                const potentialTradePartner = game.relationships.find(r => 
-                  !r.treaties.includes('Trade') && r.status !== RelationshipStatusValues.War
-                );
-                
-                if (potentialTradePartner) {
-                  establishTrade(potentialTradePartner.cityState);
-                }
-              }}
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" className="text-[#8B4513] mr-2 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
-              </svg>
-              <div className="text-left">
-                <div className="cinzel font-bold">Establish Trade Route</div>
-                <div className="text-xs text-[#333333]">Increase income from commerce</div>
-              </div>
-            </Button>
-          </div>
-          
-          {/* Build Menu */}
-          {buildMenuOpen && (
-            <div className="mt-4 p-3 border border-[#D2B48C] rounded">
-              <h4 className="cinzel font-bold text-[#8B4513] mb-2">Available Structures</h4>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                <Button 
-                  variant="outline"
-                  className="justify-start border-[#8B4513] text-[#8B4513] hover:bg-[#D2B48C]"
-                  onClick={() => handleBuildStructure(
-                    'Agora', 
-                    PolicyCategoryValues.Economic, 
-                    300, 
-                    { gold: 20, happiness: 10 }
-                  )}
-                >
-                  <div className="text-left">
-                    <div className="font-bold">Agora (300 gold)</div>
-                    <div className="text-xs">+20 gold/turn, +10 happiness</div>
-                  </div>
-                </Button>
-                <Button 
-                  variant="outline"
-                  className="justify-start border-[#8B4513] text-[#8B4513] hover:bg-[#D2B48C]"
-                  onClick={() => handleBuildStructure(
-                    'Temple', 
-                    PolicyCategoryValues.Cultural, 
-                    250, 
-                    { happiness: 25 }
-                  )}
-                >
-                  <div className="text-left">
-                    <div className="font-bold">Temple (250 gold)</div>
-                    <div className="text-xs">+25 happiness</div>
-                  </div>
-                </Button>
-                <Button 
-                  variant="outline"
-                  className="justify-start border-[#8B4513] text-[#8B4513] hover:bg-[#D2B48C]"
-                  onClick={() => handleBuildStructure(
-                    'Barracks', 
-                    PolicyCategoryValues.Military, 
-                    350, 
-                    { military: 50 }
-                  )}
-                >
-                  <div className="text-left">
-                    <div className="font-bold">Barracks (350 gold)</div>
-                    <div className="text-xs">+50 military strength</div>
-                  </div>
-                </Button>
-                <Button 
-                  variant="outline"
-                  className="justify-start border-[#8B4513] text-[#8B4513] hover:bg-[#D2B48C]"
-                  onClick={() => handleBuildStructure(
-                    'Farm', 
-                    PolicyCategoryValues.Economic, 
-                    200, 
-                    { food: 30 }
-                  )}
-                >
-                  <div className="text-left">
-                    <div className="font-bold">Farm (200 gold)</div>
-                    <div className="text-xs">+30 food/turn</div>
-                  </div>
-                </Button>
-              </div>
+          ))}
+
+          {game.events.length === 0 && (
+            <div className="text-center py-4 text-gray-500">
+              No events yet. End your turn to begin your journey.
             </div>
           )}
-        </CardContent>
-      </Card>
-      
-      {/* Current Policies */}
-      <Card>
-        <CardContent className="p-4">
-          <h3 className="text-lg cinzel font-bold text-[#8B4513] mb-3">Active Policies</h3>
-          <div className="space-y-2">
-            {game.policies.length > 0 ? (
-              game.policies.map(policy => (
-                <div 
-                  key={policy.id} 
-                  className={`p-2 border-l-4 bg-[#D2B48C] bg-opacity-20 ${
-                    policy.category === PolicyCategoryValues.Economic 
-                      ? 'border-[#B8860B]' 
-                      : policy.category === PolicyCategoryValues.Military 
-                      ? 'border-[#FF9800]' 
-                      : policy.category === PolicyCategoryValues.Cultural 
-                      ? 'border-[#4CAF50]'
-                      : 'border-[#8B4513]'
-                  }`}
-                >
-                  <div className="flex justify-between">
-                    <div className="font-bold">{policy.name}</div>
-                    <Button 
-                      variant="ghost" 
-                      className="h-5 w-5 p-0 text-[#8B4513] hover:text-red-500"
-                      onClick={() => removePolicy(policy.id)}
-                    >
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                      </svg>
-                    </Button>
-                  </div>
-                  <div className="text-sm">{policy.description}</div>
-                </div>
-              ))
-            ) : (
-              <div className="text-center py-4 text-gray-500">
-                No active policies. Build structures or enact laws to establish policies.
-              </div>
-            )}
+        </div>
+
+        <Button 
+          className="mt-3 w-full bg-[#D2B48C] hover:bg-amber-200 text-[#8B4513] p-2 rounded border border-[#8B4513] cinzel"
+          onClick={exportHistory}
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 inline mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+          </svg> Export History
+        </Button>
+      </div>
+      {/* Happiness Section */}
+      <div className="bg-white rounded-lg shadow-md p-4 mt-4">
+        <div className="flex flex-row justify-between mt-2">
+          <div>
+            <p className="text-sm">Happiness</p>
+          </div>
+          <div className="flex items-center">
+            <p className="text-sm">{game.playerCityState.resources.happiness.toLocaleString()}</p>
             <Button 
-              className="mt-3 w-full bg-[#8B4513] hover:bg-amber-800 text-white p-2 rounded"
-              onClick={() => {
-                // Open some policy management UI
-                // For now just adds a sample policy
-                addPolicy({
-                  id: uuidv4(),
-                  name: 'Fair Taxation',
-                  description: 'Moderate income, high citizen happiness',
-                  effects: { gold: 10, happiness: 5 },
-                  category: PolicyCategoryValues.Economic,
-                  active: true
-                });
-              }}
+              variant="ghost" 
+              size="sm" 
+              className="ml-1 h-5 w-5 p-0" 
+              onClick={() => setShowHappinessDetails(prevState => !prevState)}
             >
-              Manage Policies
+              <span className="text-xs">ⓘ</span>
             </Button>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+
+        {showHappinessDetails && game.playerCityState.resources.happinessFactors && (
+          <div className="mt-2 text-xs bg-[#D2B48C] bg-opacity-20 p-2 rounded">
+            <h4 className="font-bold mb-1">Happiness Factors:</h4>
+            <div className="grid grid-cols-2 gap-x-2 gap-y-1">
+              <div>Taxation:</div>
+              <div className={game.playerCityState.resources.happinessFactors.taxationLevel >= 0 ? "text-green-700" : "text-red-700"}>
+                {game.playerCityState.resources.happinessFactors.taxationLevel > 0 ? "+" : ""}
+                {game.playerCityState.resources.happinessFactors.taxationLevel}
+              </div>
+
+              <div>Food Security:</div>
+              <div className={game.playerCityState.resources.happinessFactors.foodSecurity >= 0 ? "text-green-700" : "text-red-700"}>
+                {game.playerCityState.resources.happinessFactors.foodSecurity > 0 ? "+" : ""}
+                {game.playerCityState.resources.happinessFactors.foodSecurity}
+              </div>
+
+              <div>Military Presence:</div>
+              <div className={game.playerCityState.resources.happinessFactors.militaryPresence >= 0 ? "text-green-700" : "text-red-700"}>
+                {game.playerCityState.resources.happinessFactors.militaryPresence > 0 ? "+" : ""}
+                {game.playerCityState.resources.happinessFactors.militaryPresence}
+              </div>
+
+              <div>Culture:</div>
+              <div className="text-green-700">
+                +{game.playerCityState.resources.happinessFactors.culturalInvestment}
+              </div>
+
+              <div>War Weariness:</div>
+              <div className={game.playerCityState.resources.happinessFactors.warWeariness >= 0 ? "text-green-700" : "text-red-700"}>
+                {game.playerCityState.resources.happinessFactors.warWeariness}
+              </div>
+
+              <div>Political Stability:</div>
+              <div className={game.playerCityState.resources.happinessFactors.politicalStability >= 0 ? "text-green-700" : "text-red-700"}>
+                {game.playerCityState.resources.happinessFactors.politicalStability > 0 ? "+" : ""}
+                {game.playerCityState.resources.happinessFactors.politicalStability}
+              </div>
+
+              <div>Recent Events:</div>
+              <div className={game.playerCityState.resources.happinessFactors.recentEvents >= 0 ? "text-green-700" : "text-red-700"}>
+                {game.playerCityState.resources.happinessFactors.recentEvents > 0 ? "+" : ""}
+                {game.playerCityState.resources.happinessFactors.recentEvents}
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 };
 
-export default CityTab;
+export default GameSidebar;
