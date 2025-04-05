@@ -7,11 +7,8 @@ import { GameEvent } from '@shared/schema';
 import { EventSeverities } from '@/lib/game-enums-fix';
 import { saveAs } from 'file-saver';
 import { EventLogModal } from './EventLogModal';
-import { EventChoiceModal } from './EventChoiceModal';
 
 interface GameSidebarProps {
-  // onOpenEventLog: () => void;
-  // onEventChoice: () => void;
 }
 
 const GameSidebar: React.FC<GameSidebarProps> = () => {
@@ -19,7 +16,6 @@ const GameSidebar: React.FC<GameSidebarProps> = () => {
   const { session, isMyTurn, actionsRemaining, endTurn: endMultiplayerTurn } = useMultiplayer();
   const [showHappinessDetails, setShowHappinessDetails] = React.useState(false);
   const [isEventLogOpen, setIsEventLogOpen] = React.useState(false);
-  const [isEventChoiceOpen, setIsEventChoiceOpen] = React.useState(false);
 
   if (!game) {
     return <div>Loading...</div>;
@@ -74,14 +70,6 @@ const GameSidebar: React.FC<GameSidebarProps> = () => {
     setIsEventLogOpen(false);
   };
 
-  const handleEventChoice = () => {
-    setIsEventChoiceOpen(true);
-  };
-
-  const handleCloseEventChoice = () => {
-    setIsEventChoiceOpen(false);
-  };
-
   return (
     <div className="w-full lg:w-1/4">
       {/* Turn Information */}
@@ -119,7 +107,6 @@ const GameSidebar: React.FC<GameSidebarProps> = () => {
         </div>
       )}
 
-
       {/* Event Log */}
       <div className="bg-white rounded-lg shadow-md p-4">
         <div className="flex justify-between items-center mb-2">
@@ -145,26 +132,8 @@ const GameSidebar: React.FC<GameSidebarProps> = () => {
                 {event.title}
               </h4>
               <p className="text-sm">{event.description}</p>
-
-              {event.choices && event.choices.length > 0 && (
-                <div className="mt-2">
-                  <Button 
-                    variant="outline" 
-                    className="w-full text-sm border-[#8B4513] text-[#8B4513] hover:bg-[#D2B48C]"
-                    onClick={handleEventChoice}
-                  >
-                    Make a decision...
-                  </Button>
-                </div>
-              )}
             </div>
           ))}
-
-          {game.events.length === 0 && (
-            <div className="text-center py-4 text-gray-500">
-              No events yet. End your turn to begin your journey.
-            </div>
-          )}
         </div>
 
         <Button 
@@ -176,6 +145,7 @@ const GameSidebar: React.FC<GameSidebarProps> = () => {
           </svg> Export History
         </Button>
       </div>
+
       {/* Happiness Section */}
       <div className="bg-white rounded-lg shadow-md p-4 mt-4">
         <div className="flex flex-row justify-between mt-2">
@@ -242,13 +212,10 @@ const GameSidebar: React.FC<GameSidebarProps> = () => {
           </div>
         )}
       </div>
+
       <EventLogModal 
         open={isEventLogOpen} 
         onOpenChange={handleCloseEventLog} 
-      />
-      <EventChoiceModal 
-        open={isEventChoiceOpen} 
-        onOpenChange={handleCloseEventChoice} 
       />
     </div>
   );
