@@ -36,7 +36,7 @@ app.use((req, res, next) => {
   next();
 });
 
-(async () => {
+const startServer = async () => {
   const server = await registerRoutes(app);
 
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
@@ -68,4 +68,7 @@ app.use((req, res, next) => {
   }, () => {
     log(`serving on port ${port}`);
   });
-})();
+};
+
+startServer();
+
