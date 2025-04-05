@@ -12,7 +12,7 @@ export default defineConfig({
     ...(process.env.NODE_ENV !== "production" &&
     process.env.REPL_ID !== undefined
       ? [
-          await import("@replit/vite-plugin-cartographer").then((m) =>
+          import("@replit/vite-plugin-cartographer").then((m) =>
             m.cartographer(),
           ),
         ]
@@ -29,5 +29,15 @@ export default defineConfig({
   build: {
     outDir: path.resolve(import.meta.dirname, "dist/public"),
     emptyOutDir: true,
+    sourcemap: true,
+    rollupOptions: {
+      input: {
+        main: path.resolve(import.meta.dirname, "client", "index.html"),
+      },
+    },
+  },
+  server: {
+    port: 5000,
+    host: true,
   },
 });
