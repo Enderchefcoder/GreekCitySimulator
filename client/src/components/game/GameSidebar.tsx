@@ -5,6 +5,7 @@ import { ResourceTypeValues } from '@shared/schema';
 import { Button } from '@/components/ui/button';
 import { GameEvent } from '@shared/schema';
 import { EventSeverities } from '@/lib/game-enums-fix';
+import { saveAs } from 'file-saver';
 
 interface GameSidebarProps {
   onOpenEventLog: () => void;
@@ -41,6 +42,24 @@ const GameSidebar: React.FC<GameSidebarProps> = ({ onOpenEventLog, onEventChoice
     } else {
       endTurn();
     }
+  };
+
+  const exportHistory = () => {
+    const { game } = useGame();
+    if (!game) return;
+
+    const historyData = {
+      cityState: game.playerCityState.name,
+      startYear: game.startYear,
+      endYear: game.year,
+      turns: game.turn,
+      events: game.events,
+      resources: game.playerCityState.resources,
+      policies: game.playerCityState.policies
+    };
+
+    const blob = new Blob([JSON.stringify(historyData, null, 2)], { type: 'application/json' });
+    saveAs(blob, `greek-city-history-turn-${game.turn}.json`);
   };
 
   return (
