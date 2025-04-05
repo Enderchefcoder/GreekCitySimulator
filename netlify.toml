@@ -20,11 +20,9 @@
 
 [functions]
   directory = "dist"
-  node_version = "18"
 
-[functions.build]
-  command = "npm run build"
-  publish = "dist"
+[functions.node_version]
+  external_node_modules = []
 
 [functions.environment]
   NODE_ENV = "production"
