@@ -1,6 +1,7 @@
 [build]
   command = "npm run build"
-  publish = "dist"
+  publish = "dist/public"
+  base = "/"
 
 [build.environment]
   NODE_VERSION = "18"
@@ -9,3 +10,21 @@
   from = "/*"
   to = "/index.html"
   status = 200
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    Access-Control-Allow-Origin = "*"
+    Access-Control-Allow-Methods = "GET, POST, PUT, DELETE, OPTIONS"
+    Access-Control-Allow-Headers = "Content-Type, Authorization"
+
+[functions]
+  directory = "dist"
+  node_version = "18"
+
+[functions.build]
+  command = "npm run build"
+  publish = "dist"
+
+[functions.environment]
+  NODE_ENV = "production"
